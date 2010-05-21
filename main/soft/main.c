@@ -26,45 +26,57 @@
  * Maintainers: tarik.graba@telecom-paristech.fr
  */
 
-
+#include <stdint.h>
 #include <stdio.h>
 #include "lm32_irq.h"
+#include "../segmentation.h"
 
+#define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
 
-#define N 10
+//in word (4 bytes)
+#define WIDTH 640
+#define HEIGHT 480
+#define MODULO 10
 
-int fibo(int n);
+int damier(int i, int j) {
+	i = i % MODULO;
+	j = j % MODULO;
+	if (i<MODULO/2 && j<MODULO/2) return 0xffffffff;
+	if (i>= MODULO/2 && j< MODULO/2) return 0;
+	if (i< MODULO/2 && j>= MODULO/2) return 0;
+	return 0xffffffff;
+}
 
 int main(void)
 {
     //mfixed A,B,C,D;
-    int i;
-    int  fibov[N], fibot[N];
-    fibot[0] = get_cc();
-    for (i = 1; i < N; i++)
-    {
-        fibov[i] = fibo(i);fibot[i] = get_cc();
-    }
-    fibov [0]= get_cc();
+    int i,j;
+		static unsigned char image[HEIGHT][WIDTH] = { { 0 } };
 
-    printf(" Start time %d\n", fibot[0]);
+		printf("%x %x %x %x\n",&image[0][0],&image[0][1],&image[0][2],&image[0][3]);
+		printf("toto \n");
+		printf("%x %x %x %x\n",&image[1][0],&image[1][1],&image[1][2],&image[1][3]);
 
-    for (i = 1; i < 10; i++)
-        printf(" Fibo %d : %d at %d\n",i,fibov[i],fibot[i]-fibot[i-1]);
+			for (j=0;j<WIDTH;j++) {
+				image[0][j] = 0xff;
+			}
+		printf("%x %x %x %x\n",image[0][0],image[0][1],image[0][2],image[0][3]);
+		printf("toto \n");
+		printf("%x %x %x %x\n",image[1][0],image[1][1],image[1][2],image[1][3]);
 
-    printf("End  time %d\n", fibov[0]);
+		for (i=0;i<HEIGHT/4;i++) {
+			for (j=0;j<WIDTH/4;j++) {
+				image[i][j]=damier(i,j);
+			}
+		}
+	
+	printf("address :0x%x \n",(uint32_t)image);
+		VIDEO_OUT=(uint32_t) image;
+
 
     getchar();
     return 0;
 }
 
 
-int fibo(int n)
-{
-    if (n==0)
-        return 1;
-    else if (n==1)
-        return 1;
-    else return fibo(n-1) + fibo(n-2);
-}
 

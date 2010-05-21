@@ -43,10 +43,11 @@
 //	The segment names cannot be changed.
 /////////////////////////////////////////////////////////////////
 
-#define	ROM_BASE    0x00000000
-#define	ROM_SIZE    0x00100000 // 1M
-#define	RAM_BASE    0x40000000 
-#define	RAM_SIZE    0x02000000 // 32M
-#define	TTY_BASE    0xA0000000
-#define	TTY_SIZE    0x00000100
-
+#define	ROM_BASE    		0x00000000
+#define	ROM_SIZE    		0x00100000 // 1M
+#define	RAM_BASE    		0x40000000 
+#define	RAM_SIZE    		0x02000000 // 32M
+#define	TTY_BASE    		0xA0000000
+#define	TTY_SIZE    		0x00000100
+#define VIDEO_OUT_BASE	0xB0000000
+#define VIDEO_OUT_SIZE  0x00000100
