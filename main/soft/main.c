@@ -31,7 +31,8 @@
 #include "lm32_irq.h"
 #include "../segmentation.h"
 
-#define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
+#define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
+#define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
 
 //in word (4 bytes)
 #define WIDTH 160
@@ -50,19 +51,20 @@ int damier(int i, int j) {
 
 int main(void)
 {
-    //mfixed A,B,C,D;
-    int i,j;
-		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
+//    //mfixed A,B,C,D;
+//    int i,j;
+//		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
+//
+//		for (i=0;i<HEIGHT;i++) {
+//			for (j=0;j<WIDTH/4;j++) {
+//				image[i][j]=damier(i,j);
+//			}
+//		}
+//	
+//	printf("address :0x%x \n",(uint32_t)image);
+//		VIDEO_OUT=(uint32_t) image;
 
-		for (i=0;i<HEIGHT;i++) {
-			for (j=0;j<WIDTH/4;j++) {
-				image[i][j]=damier(i,j);
-			}
-		}
-	
-	printf("address :0x%x \n",(uint32_t)image);
-		VIDEO_OUT=(uint32_t) image;
-
+    VIDEO_IN = RAM_BASE + 0x10;
 
     getchar();
     return 0;

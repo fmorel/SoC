@@ -1,0 +1,24 @@
+
+# -*- python -*-
+
+Module('caba:video_in',
+        classname = 'soclib::caba::VideoIn',
+        tmpl_parameters = [
+            parameter.Module('wb_param',  default = 'caba:wb_param'),
+        ],
+        header_files = ['video_in.h',],
+        implementation_files = ['video_in.cpp',],
+        ports = [
+            Port('caba:wb_slave', 'p_wb'),
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+            Port('caba:bit_in', 'line_valid'),
+            Port('caba:bit_in', 'frame_valid'),
+#            Port('caba:', 'pixel_out'),
+        ],
+        uses = [
+        Uses('caba:wishbone'),
+        ],
+        debug = True ,
+      )
+
