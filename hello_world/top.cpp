@@ -48,6 +48,10 @@
 // locals
 #include "segmentation.h"
 
+#include "wb_simple_slave.h"
+#include "wb_simple_master.h"
+#include "wb_timer.h"
+
 // real SystemC main
 int _main(int argc, char *argv[])
 {
@@ -68,6 +72,9 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("rom" , ROM_BASE , ROM_SIZE , IntTab(0), true));
     maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
     maptab.add(Segment("tty"  , TTY_BASE  , TTY_SIZE  , IntTab(2), false));
+    maptab.add(Segment("wb_slave"  , WBS_BASE  , WBS_SIZE  , IntTab(3), false));
+    maptab.add(Segment("wb_timer"  , WBT_BASE  , WBT_SIZE  , IntTab(4), false));
+
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
@@ -84,9 +91,13 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_wb_ram("signal_wb_ram");
     soclib::caba::WbSignal<wb_param> signal_wb_rom("signal_wb_rom");
     soclib::caba::WbSignal<wb_param> signal_wb_tty("signal_wb_tty");
+    soclib::caba::WbSignal<wb_param> signal_wb_slave("signal_wb_slave");
+    soclib::caba::WbSignal<wb_param> signal_wb_master("signal_wb_master");
+    soclib::caba::WbSignal<wb_param> signal_wb_timer("signal_wb_timer");
 
     // irq from uart
     sc_signal<bool> signal_tty_irq("signal_tty_irq");
+    sc_signal<bool> signal_timer_irq("signal_timer_irq");
     // unconnected irqs
     sc_signal<bool> unconnected_irq ("unconnected_irq");
 
@@ -113,7 +124,7 @@ int _main(int argc, char *argv[])
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 1,3);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 2,5);
 
     ////////////////////////////////////////////////////////////
     /////////////////// WB -> VCI Wrappers /////////////////////
@@ -140,6 +151,24 @@ int _main(int argc, char *argv[])
     tty_w.p_vci               (signal_vci_tty);
     tty_w.p_wb                (signal_wb_tty);
 
+    //Simple slave
+    soclib::caba::WbSimpleSlave<wb_param> simple_slave ("WB_simple_slave");
+    simple_slave.p_clk              (signal_clk);
+    simple_slave.p_resetn           (signal_resetn);
+    simple_slave.p_wb               (signal_wb_slave);
+
+    //Simple master
+    soclib::caba::WbSimpleMaster<wb_param> simple_master ("WB_simple_master");
+    simple_master.p_clk              (signal_clk);
+    simple_master.p_resetn           (signal_resetn);
+    simple_master.p_wb               (signal_wb_master);
+
+    soclib::caba::WbTimer<wb_param> timer ("WB_timer");
+    timer.p_clk                   (signal_clk);
+    timer.p_resetn                (signal_resetn);
+    timer.p_wb                    (signal_wb_timer);
+    timer.p_S_INT_O               (signal_timer_irq);
+
     ////////////////////////////////////////////////////////////
     ///////////////////// WB Net List //////////////////////////
     ////////////////////////////////////////////////////////////
@@ -148,10 +177,13 @@ int _main(int argc, char *argv[])
     wbinterco.p_resetn(signal_resetn);
 
     wbinterco.p_from_master[0](signal_wb_lm32);
+    wbinterco.p_from_master[1](signal_wb_master);
 
     wbinterco.p_to_slave[0](signal_wb_rom);
     wbinterco.p_to_slave[1](signal_wb_ram);
     wbinterco.p_to_slave[2](signal_wb_tty);
+    wbinterco.p_to_slave[3](signal_wb_slave);
+    wbinterco.p_to_slave[4](signal_wb_timer);
 
     // lm32
     lm32.p_clk(signal_clk);
@@ -161,7 +193,8 @@ int _main(int argc, char *argv[])
     // To avoid adding inverters here, we consider
     // them active high
     lm32.p_irq[0] (signal_tty_irq);
-    for (int i=1; i<32; i++)
+    lm32.p_irq[1] (signal_timer_irq);
+    for (int i=2; i<32; i++)
         lm32.p_irq[i] (unconnected_irq);
 
     ////////////////////////////////////////////////////////////

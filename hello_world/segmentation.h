@@ -43,10 +43,17 @@
 //	The segment names cannot be changed.
 /////////////////////////////////////////////////////////////////
 
+#include "Timer.h"
+
 #define	ROM_BASE    0x00000000
 #define	ROM_SIZE    0x00100000 // 1M
 #define	RAM_BASE    0x40000000 
 #define	RAM_SIZE    0x02000000 // 32M
 #define	TTY_BASE    0xA0000000
 #define	TTY_SIZE    0x00000100
-
+#define WBS_BASE    0xA0000200
+#define WBS_SIZE    0x00000100
+#define WBM_BASE    0xA0000400
+#define WBM_SIZE    0x00000100
+#define WBT_BASE    TIMER_BASE 
+#define WBT_SIZE    TIMER_SIZE

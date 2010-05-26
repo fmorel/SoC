@@ -26,7 +26,7 @@
 
 OUTPUT_FORMAT("elf32-lm32")
 ENTRY(_start)
-INPUT(crti.o crtbegin.o crt0bootloader.o soclib_exit.o crtend.o crtn.o)
+INPUT(crti.o crtbegin.o soclib_exit.o crtend.o crtn.o)
 GROUP(-lgloss -lno_os_soclib -lc -lgcc)
 
 /* Peripherals */

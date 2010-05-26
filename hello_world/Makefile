@@ -3,7 +3,7 @@ SOFT       = soft/soft.elf
 OUTPUT_LOG = simu.log
 
 PLATFORM_DESC    =  platform_desc
-SOCLIB_INCLUDES  = -I.
+SOCLIB_INCLUDES  = -I. -Iwb_simple_slave -Iwb_simple_master -Iwb_timer
 SOCLIB_CC_ARGS   = -j4 -p $(PLATFORM_DESC) $(SOCLIB_INCLUDES)
 
 SOCLIB_CC = soclib-cc
