@@ -5,7 +5,7 @@ TARGET_ARCH  = -mmultiply-enabled -mbarrel-shift-enabled
 DEBUG_CFLAGS = -ggdb
 LDFLAGS      = -Tsoclib.ld
 CFLAGS       = -Wall -ggdb -O2 $(DEBUG_CFLAGS) 
-CPPFLAGS     = -I.
+CPPFLAGS     = -I. -Isrc
 
 SOFT_IMAGE = soft.elf
 
