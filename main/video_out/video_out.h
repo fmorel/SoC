@@ -34,7 +34,7 @@
 #define HEIGHT 480
 
 //number of lines buffered
-#define BUFLINE 4
+#define BUFLINE 16
 
 namespace soclib { namespace caba {
 

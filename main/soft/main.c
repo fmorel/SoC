@@ -34,12 +34,13 @@
 #define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
 
 //in word (4 bytes)
-#define WIDTH 640
+#define WIDTH 160
 #define HEIGHT 480
-#define MODULO 10
+#define MODULO 16
 
 int damier(int i, int j) {
 	i = i % MODULO;
+	j *= 4;
 	j = j % MODULO;
 	if (i<MODULO/2 && j<MODULO/2) return 0xffffffff;
 	if (i>= MODULO/2 && j< MODULO/2) return 0;
@@ -51,20 +52,9 @@ int main(void)
 {
     //mfixed A,B,C,D;
     int i,j;
-		static unsigned char image[HEIGHT][WIDTH] = { { 0 } };
+		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
 
-		printf("%x %x %x %x\n",&image[0][0],&image[0][1],&image[0][2],&image[0][3]);
-		printf("toto \n");
-		printf("%x %x %x %x\n",&image[1][0],&image[1][1],&image[1][2],&image[1][3]);
-
-			for (j=0;j<WIDTH;j++) {
-				image[0][j] = 0xff;
-			}
-		printf("%x %x %x %x\n",image[0][0],image[0][1],image[0][2],image[0][3]);
-		printf("toto \n");
-		printf("%x %x %x %x\n",image[1][0],image[1][1],image[1][2],image[1][3]);
-
-		for (i=0;i<HEIGHT/4;i++) {
+		for (i=0;i<HEIGHT;i++) {
 			for (j=0;j<WIDTH/4;j++) {
 				image[i][j]=damier(i,j);
 			}
