@@ -52,6 +52,8 @@
 #include "segmentation.h"
 #include "video_gen.h"
 
+#include "increment.h"
+
 //Wb simple slave
 #include "video_out.h"
 
@@ -108,6 +110,14 @@ int _main(int argc, char *argv[])
 		//WB master
 		soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
 		
+
+		//WB slave	
+    soclib::caba::WbSignal<wb_param> signal_increment_slave("signal_increment_slave");
+		//WB master
+		soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
+
+
+
 		//video signals
 		sc_signal<bool> frame_valid_out("frame_valid_out");
 		sc_signal<bool> line_valid_out("line_valid_out");
@@ -169,7 +179,14 @@ int _main(int argc, char *argv[])
     my_display.frame_valid(frame_valid_out);
     my_display.pixel_in(pixel_out);
 
+    //Increment
+		soclib::caba::Increment<wb_param> increment("increment");
+		increment.p_clk (signal_clk);
+		increment.p_resetn (signal_resetn);
+		increment.p_wb_slave (signal_video_out_slave);
+		increment.p_wb_master (signal_video_out_master);
 
+    soclib::caba::IncrementHard incrhard("toto");
     ////////////////////////////////////////////////////////////
     /////////////////// WB -> VCI Wrappers /////////////////////
     ////////////////////////////////////////////////////////////

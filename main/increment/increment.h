@@ -1,5 +1,5 @@
-#ifndef VIDEO_OUT_H_
-#define VIDEO_OUT_H_
+#ifndef INCREMENT_H
+#define INCREMENT_H
 
 #include <systemc>
 #include "wb_master.h"
@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "../segmentation.h"
+#include "increment_hard.h"
 
 namespace soclib { namespace caba {
 
@@ -14,8 +15,11 @@ namespace soclib { namespace caba {
 
         class Increment: public sc_core::sc_module{
             private:
+                soclib::caba::IncrementHard incrementHard;
+                sc_core::sc_in<bool>              dummy;
+                sc_core::sc_in<float>             dummy1;
 						protected:
-                SC_HAS_PROCESS(VideoOut);
+                SC_HAS_PROCESS(Increment);
             public:
                 sc_core::sc_in<bool>              p_clk;
                 sc_core::sc_in<bool>              p_resetn;
@@ -23,7 +27,7 @@ namespace soclib { namespace caba {
 								WbMaster <wb_param>    						p_wb_master;
 								WbSlave <wb_param>								p_wb_slave;
                 // constructor
-                VideoOut (sc_core::sc_module_name insname);
+                Increment (sc_core::sc_module_name insname);
 
 								void incrementTransition();
 								void incrementMoore();

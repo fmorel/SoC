@@ -13,6 +13,7 @@ Module('caba:increment',
         ],
         uses = [
         Uses('caba:wishbone'),
+        Uses('caba:increment_hard'),
         ],
         debug = True ,
       )
