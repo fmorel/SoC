@@ -9,7 +9,13 @@ CPPFLAGS     = -I.
 
 SOFT_IMAGE = soft.elf
 
-OBJS  =  main.o lm32_irq.o
+OBJS  =  main.o lm32_irq.o initial_polys.o
+
+
+PRINTF_DIR = ../../my_printf/
+OBJS += my_printf.o
+VPATH += $(PRINTF_DIR)
+CFLAGS += -I$(PRINTF_DIR)
 
 .PHONY: all clean
 
