@@ -52,7 +52,7 @@ int damier(int i, int j) {
 int main(void)
 {
     int i,j;
-		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
+//		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
 /*
 		for (i=0;i<HEIGHT;i++) {
 			for (j=0;j<WIDTH/4;j++) {
@@ -64,12 +64,10 @@ int main(void)
 	//printf("address :0x%x \n",(uint32_t)image);
   //		VIDEO_OUT=(uint32_t) image;
 //    print_a();
-    calc_polys();
+    //calc_polys();
 
 
     getchar();
     return 0;
 }
-
-
 
