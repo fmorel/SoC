@@ -48,20 +48,23 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
+#include "initial_polys.h"
 int main(void)
 {
-    //mfixed A,B,C,D;
     int i,j;
 		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
-
+/*
 		for (i=0;i<HEIGHT;i++) {
 			for (j=0;j<WIDTH/4;j++) {
 				image[i][j]=damier(i,j);
 			}
 		}
 	
-	printf("address :0x%x \n",(uint32_t)image);
-		VIDEO_OUT=(uint32_t) image;
+   */
+	//printf("address :0x%x \n",(uint32_t)image);
+  //		VIDEO_OUT=(uint32_t) image;
+//    print_a();
+    calc_polys();
 
 
     getchar();
