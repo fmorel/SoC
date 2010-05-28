@@ -23,8 +23,14 @@ namespace soclib { namespace caba {
   }
 
 	void Interpolation::interpolationMoore() {
-    int temp = buffer_in[0] + buffer_in[1] + buffer_in[2] + buffer_in[3];
-    out = temp/4;
+    int Ex,Ey;
+    Ex = (int)x;
+    Ey = (int)y;
+    int dx,dy;
+    dx = x -Ex;
+    dy = y- Ey;
+    int temp = (1-dx)*(1-dy)*buffer_in[0] + (1-dx) * dy * buffer_in[1] + dx * ( 1 - dy ) * buffer_in[2] + dx * dy * buffer_in[3];
+    out = temp;
   }
 }}
 
