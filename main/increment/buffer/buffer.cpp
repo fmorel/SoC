@@ -1,5 +1,4 @@
 #include "buffer.h"
-#include "utils.h"
 #include <iostream>
 
 namespace soclib { namespace caba {
@@ -10,7 +9,7 @@ namespace soclib { namespace caba {
 			SC_METHOD(bufferTransition);
 			dont_initialize();
 			sensitive<<p_clk.pos();
-			SC_METHOD(bufferMoore);
+			SC_METHOD(bufferMealy);
 			dont_initialize();
 			sensitive<<p_clk.neg();
 		}
