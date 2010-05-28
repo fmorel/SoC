@@ -49,8 +49,14 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
-int main(void)
-{
+void foo(void) {
+    printf("Hello from video_in\n");
+}
+
+int main(void) {
+
+    RegisterIrqEntry(2, &foo);
+
 //    //mfixed A,B,C,D;
 //    int i,j;
 //		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
