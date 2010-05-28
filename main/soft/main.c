@@ -49,13 +49,17 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
+volatile int myvar;
 void foo(void) {
-    printf("Hello from video_in\n");
+    myvar = 1;
 }
 
 int main(void) {
 
+    irq_enable();
+
     RegisterIrqEntry(2, &foo);
+
 
 //    //mfixed A,B,C,D;
 //    int i,j;
@@ -70,7 +74,13 @@ int main(void) {
 //	printf("address :0x%x \n",(uint32_t)image);
 //		VIDEO_OUT=(uint32_t) image;
 
+    myvar = 0;
     VIDEO_IN = RAM_BASE + 0x10;
+
+
+    while(myvar != 1) {}
+
+    printf("yopyop\n");
 
     getchar();
     return 0;
