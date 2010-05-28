@@ -64,7 +64,7 @@ int main(void)
 	//printf("address :0x%x \n",(uint32_t)image);
   //		VIDEO_OUT=(uint32_t) image;
 //    print_a();
-    //calc_polys();
+    calc_polys();
 
 
     getchar();
