@@ -17,6 +17,9 @@ OBJS += my_printf.o
 VPATH += $(PRINTF_DIR)
 CFLAGS += -I$(PRINTF_DIR)
 
+ROOT_DIR = ..
+CFLAGS+= -I$(ROOT_DIR)
+
 .PHONY: all clean
 
 all:$(SOFT_IMAGE)

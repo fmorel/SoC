@@ -1,0 +1,13 @@
+Module('caba:interpolation',
+        classname = 'soclib::caba::Interpolation',
+        header_files = ['interpolation.h',],
+        implementation_files = ['interpolation.cpp',],
+        ports = [
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+        ],
+        uses = [
+        ],
+        debug = True ,
+      )
+
