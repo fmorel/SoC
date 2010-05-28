@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "../segmentation.h"
+#include "../utils.h"
 
 //state of the master FSM
 #define MASTER_IDLE 0
@@ -29,12 +30,9 @@
 #define LINE_SYNC 160		
 #define FRAME_SYNC (WIDTH +LINE_SYNC)*40
 
-//image size
-#define WIDTH 640
-#define HEIGHT 480
 
 //number of lines buffered
-#define BUFLINE 16
+#define BUFLINE VIDEO_OUT_BUFSIZE
 
 namespace soclib { namespace caba {
 
