@@ -48,7 +48,7 @@
 
 // locals
 #include "segmentation.h"
-
+#define DO_TRACES
 // real SystemC main
 int _main(int argc, char *argv[])
 {
@@ -207,7 +207,7 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
     sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
     sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
-    sc_trace (TRACEFILE, signal_wb_calcul_incremental, "calcul_inc_wb" );
+    sc_trace (TRACEFILE, signal_wb_calcul_inc, "calcul_inc_wb" );
 #endif
 
     ////////////////////////////////////////////////////////////

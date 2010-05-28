@@ -31,65 +31,106 @@
 #include "lm32_irq.h"
 
 
-#define N 10
+static int a[4][4];
+static int b[4][4];
 
-int a[4][4];
-
-int fibo(int n);
-
-int poly(short X,short Y){
+int poly(short X,short Y,short reg){
     int X2,Y2;
     X2=X*X;
     Y2=Y*Y;
-
-    return X2*(a[3][0]*X+a[2][1]*Y+a[2][0])+Y2*(a[1][2]*X+a[0][3]*Y+a[0][2])+a[1][1]*X*Y+a[1][0]*X+a[0][1]*Y+a[0][0];
-
+    int result;
+    switch(reg) {
+	case 0 : result = b[2][0]<<1; break;
+	case 1 : result = (b[2][0]<<1) * X + (a[2][1]<<1) * Y + b[2][0] + b[1][0]; break;
+	case 2 : result = b[2][0]*X2+b[1][1]*X*Y+b[0][2]*Y2+b[1][0]*X+b[0][1]*Y+b[0][0]; break;
+	case 3 : result = X2*(a[3][0]*X+a[2][1]*Y+a[2][0])+Y2*(a[1][2]*X+a[0][3]*Y+a[0][2])+a[1][1]*X*Y+a[1][0]*X+a[0][1]*Y+a[0][0]; break;
+	case 4 : result = 6*a[0][3]; break;
+	case 5 : result = 6*a[0][3]; break;
+	case 6 : result = (a[1][2]<<1)*X + 6*a[0][3]*Y + 6*a[0][3]+a[0][2]; break;
+	case 7 : result = a[2][1]*X2+(a[1][2]<<1)*X*Y+3*a[0][3]*Y2+(a[1][2]+a[1][1])*X+(3*a[0][3]+2*a[0][2])*Y+a[0][3]+a[0][2]+a[0][1];break;
+	case 8 : result = 2*a[1][2]; break;
+	case 9 : result = 2*a[1][2]; break;
+	case 10 : result = 2*a[1][2]*(X+Y)+a[1][2]+a[2][1]+a[1][1];break;
+	case 11 : result = 2*a[2][1];break;
+	case 12 : result = 2*a[2][1];break;
+	default : result = 0; break;
+    }
+    return result;
 }
 
 int main(void)
 {
-    int init_time;
-    int time[256];
-    int result[16][16];
-    int i=0;
-    int j=0;
-    a[3][0]=4;
+    int i = 0;
+    //    int i = 0;
+    int j = 0;
+    int k = 0;
+    a[3][0]=0;
     a[2][1]=0;
     a[1][2]=0;
     a[0][3]=0;
-    a[2][0]=-3*(1<<8);
-    a[1][1]=-2*(1<<9);
-    a[0][2]=-(1<<8);
-    a[1][0]=2*(1<<16);
-    a[0][1]=1<<16;
+    a[2][0]=0;
+    a[1][1]=0;
+    a[0][2]=0;
+    a[1][0]=1;
+    a[0][1]=0;
     a[0][0]=0;
-    init_time=get_cc();
-    for(i=0;i<16;i++){
-	for(j=0;j<16;j++){
-	    result[i][j] = poly(i+512,j+128);
-	    time[i*16+j] = get_cc();
+
+    b[3][0]=0;
+    b[2][1]=0;
+    b[1][2]=0;
+    b[0][3]=0;
+    b[2][0]=0;
+    b[1][1]=0;
+    b[0][2]=0;
+    b[1][0]=0;
+    b[0][1]=1;
+    b[0][0]=0;
+    
+//    a[3][0]=4;
+//    a[2][1]=1;
+//    a[1][2]=1;
+//    a[0][3]=1;
+//    a[2][0]=-3*(1<<8);
+//    a[1][1]=-2*(1<<9);
+//    a[0][2]=-(1<<8);
+//    a[1][0]=2*(1<<16);
+//    a[0][1]=1<<16;
+//    a[0][0]=1;
+//
+//    b[3][0]=1;
+//    b[2][1]=4;
+//    b[1][2]=1;
+//    b[0][3]=4;
+//    b[2][0]=-(1<<8);
+//    b[1][1]=-2*(1<<9);
+//    b[0][2]=-3*(1<<8);
+//    b[1][0]=(1<<16);
+//    b[0][1]=2*(1<<16);
+//    b[0][0]=1;
+    for(j= 0 ; j<40 ; j++){
+	for(k=0 ; k<30 ; k++){
+	    for(i = 0; i<13; i++){
+		*((volatile unsigned int*) 0xB0000000) = poly(j*16,k*16,i)>>1;
+	    }
+	    i = 0;
+	    while( i < 500)
+	    {
+		i++;
+	    }
+
 	}
     }
-    printf(" Start time : %d\n",time[0]);
-    for(i=0;i<16;i++){
-	for(j=0;j<16;j++){
-	    if(i==0&&j==0)
-		printf("Poly %d,%d : %d at %d\n",i+512,j+128,result[i][j]>>16,time[0]-init_time);
-	    else
-		printf("Poly %d,%d : %d at %d\n",i+512,j+128,result[i][j]>>16,time[i*16+j]-time[i*16+j-1]);
-	}
+    for(i = 0; i < 13; i++){
+	j+=4;
     }
-    getchar();
+    /*
+       printf(" start time : %d & end time : %d\n",init_time,end_time);
+       printf(" average duration : %d \n",(end_time-init_time));
+       for(i=0;i<13;i++){
+       printf(" result : %d\n",poly_to_send[i]);
+       }
+
+       getchar();*/
     return 0;
-}
-
-
-int fibo(int n)
-{
-    if (n==0)
-	return 1;
-    else if (n==1)
-	return 1;
-    else return fibo(n-1) + fibo(n-2);
 }
 

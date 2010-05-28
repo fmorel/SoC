@@ -1,11 +1,10 @@
 #ifndef CALCUL_INCREMENTAL_H
 #define CALCUL_INCREMENTAL_H
 
-#define SC_INCLUDE_FX
+//#define SC_INCLUDE_FX
 #include <systemc.h>
 #include "wb_slave.h"
 
-//#define sc_int<32> sc_int<32>
 
 namespace soclib { namespace caba {
 
@@ -36,7 +35,7 @@ namespace soclib { namespace caba {
 	    private:
 		const char *base_name;
 		// paramètres de l'image
-		sc_dt::sc_fixed_fast<10,32> poly_reg[13];
+		sc_dt::sc_uint<32> poly_reg[13];
 
 	};
 
