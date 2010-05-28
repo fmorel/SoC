@@ -1,0 +1,10 @@
+#ignore object files
+*.o
+#ignore vim swap files
+.*.swp
+#ignore simulation executables
+*.x
+#ignore logs
+*.log
+#ignore elf files
+*.elf
