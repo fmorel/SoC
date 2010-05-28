@@ -10,6 +10,7 @@ namespace soclib { namespace caba {
      ,incrementHard("increment hard")
      ,interpolation("interpolation")
      ,buffer("buffer")
+    ,wb_arbiter("arbiter")
 		{
 			std::cout << "WishBone increment"  << name() 
 				<< " created sucsesfully" << std::endl;

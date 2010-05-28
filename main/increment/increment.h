@@ -9,6 +9,7 @@
 #include "segmentation.h"
 #include "increment_hard.h"
 #include "interpolation.h"
+#include "increment_wb.h"
 #include "buffer.h"
 
 namespace soclib { namespace caba {
@@ -20,6 +21,7 @@ namespace soclib { namespace caba {
                 soclib::caba::IncrementHard incrementHard;
                 soclib::caba::Interpolation interpolation;
                 soclib::caba::Buffer buffer;
+                soclib::caba::WbArbiter wb_arbiter;
                 sc_core::sc_in<bool>              dummy;
                 sc_core::sc_in<float>             dummy1;
 						protected:
@@ -27,9 +29,9 @@ namespace soclib { namespace caba {
             public:
                 sc_core::sc_in<bool>              p_clk;
                 sc_core::sc_in<bool>              p_resetn;
-								//wishbone interface
-								WbMaster <wb_param>    						p_wb_master;
-								WbSlave <wb_param>								p_wb_slave;
+		//wishbone interface
+		WbMaster <wb_param>		  p_wb_master;
+		WbSlave <wb_param>		  p_wb_slave;
                 // constructor
                 Increment (sc_core::sc_module_name insname);
 
