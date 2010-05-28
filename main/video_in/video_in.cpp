@@ -48,7 +48,8 @@ namespace soclib { namespace caba {
             if(!p_resetn) {
                 cout << "VIDEO_IN: Reset." << endl;
                 slave_state = WAIT_CONFIG;
-                write_address = 0x0;
+                start_address = 0;
+                write_address = 0;
                 count = 0;
                 w_line = 0; w_pixel = 0;
                 r_line = 0; r_pixel = 0;
@@ -59,10 +60,17 @@ namespace soclib { namespace caba {
 
                 case WAIT_CONFIG:
                     if (p_wb_slave.STB_I && p_wb_slave.CYC_I) {
-                        next_state = ACK_AND_WAIT_FRAME;
+                        if(p_wb_slave.WE_I)     // Write
+                            next_state = ACK_AND_WAIT_FRAME;
+                        else    // Read (internal state through write_address)
+                            next_state = ACK_READ;
                     } else {
                         next_state = WAIT_CONFIG;
                     }
+                    break;
+
+                case ACK_READ:
+                    next_state = WAIT_CONFIG;
                     break;
 
                 case ACK_AND_WAIT_FRAME:
@@ -81,6 +89,7 @@ namespace soclib { namespace caba {
                     if(!frame_valid) {
                         next_state = WAIT_CONFIG;
                     } else {
+                        pixel_temp = pixel_in;
                         next_state = RECEIVE;
                     }
                     break;
@@ -111,7 +120,7 @@ namespace soclib { namespace caba {
                 case WAIT:
                     // If there is at least one line loaded in the buffer,
                     // start flushing.
-                    if(w - r > I_WIDTH) {
+                    if(w - r > I_WIDTH || (w == 0 && r > 0)) {
                         next_state = START_FLUSH;
                     } else {
                         next_state = WAIT;
@@ -129,13 +138,17 @@ namespace soclib { namespace caba {
                     // while waiting for the next image.
                     if(r + 4 >= w && !(w == 0)) {
                         next_state = STOP_FLUSH;
-                    } else if(r == I_WIDTH * I_HEIGHT - 1) {    // End of image.
-                        r_line = 0;
-                        r_pixel = 0;
-                        next_state = STOP_FLUSH;
+                    } else if(r >= I_WIDTH * I_HEIGHT - 1) {    // End of image.
+                        cout << "VIDEO_IN: End of image." << endl;
+                        next_state = STOP_FLUSH_END_IMG;
                     } else {
                         next_state = FLUSH;
                     }
+                    break;
+    
+                case STOP_FLUSH_END_IMG:
+//                    cout << "DEBUG: Stop flushing." << endl;
+                    next_state = WAIT;
                     break;
     
                 case STOP_FLUSH:
@@ -160,39 +173,40 @@ namespace soclib { namespace caba {
             switch(slave_state) {
 
                 case WAIT_CONFIG:
+                    p_wb_slave.ACK_O = 0;
+                    w_pixel = 0;
+                    w_line  = 0;
                     break;
 
                 case ACK_AND_WAIT_FRAME:
-                    // Coming from WAIT_CONFIG, we set ACK_O to 1.
-                    cout << "VIDEO_IN: Selected." << endl;
                     // Update the address and acknowledge the reqest.
+                    start_address = p_wb_slave.DAT_I.read();
                     write_address = p_wb_slave.DAT_I.read();
-                    cout << "VIDEO_IN: write_address = " << write_address << endl;
+                    cout << "VIDEO_IN: start_address = " << start_address << endl;
+                    // Make the address available for control.
 
+                    // Coming from WAIT_CONFIG, we set ACK_O to 1.
                     p_wb_slave.ACK_O = 1;
                     count = 0;
+                    break;
+
+                case ACK_READ:
+                    p_wb_slave.ACK_O = 1;
                     break;
 
                 case WAIT_FRAME:
                     // Coming from ACK_AND_WAIT_FRAME, we set ACK_O to 0.
                     p_wb_slave.ACK_O = 0;
+                    w_pixel = 0;
+                    w_line  = 0;
                     count = 0;
                     break;
 
                 case RECEIVE:
-                    // Reset write_address when the frame is finished and wait for
-                    // the next address to write.
-                    if(!frame_valid) {
-//                        cout << "VIDEO_IN: " << w_line << " - " << w_pixel << endl;
-                        write_address = 0;
-                        w_pixel = 0;
-                        w_line  = -1;
-                    }
-            
                     // If we are receiving a frame, store the pixel in the buffer.
                     // We sample every 4 clocks.
                     if(frame_valid && line_valid && (count % 4 == 0)) {
-                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_in;
+                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_temp;
                         w_pixel = (w_pixel + 1) % I_WIDTH;
                         w_line = w_pixel == 0 ? (w_line + 1) % I_HEIGHT : w_line;
                     }
@@ -202,6 +216,11 @@ namespace soclib { namespace caba {
                 default:
                     break;
             }
+
+            // Always ouput the start_address (indicates the internal state)
+            // on DAT_O.
+            p_wb_slave.DAT_O.write(start_address);
+
         }
 
 
@@ -217,6 +236,7 @@ namespace soclib { namespace caba {
                     p_wb_master.STB_O = 0;
                     p_wb_master.CYC_O = 0;
                     p_wb_master.WE_O = 0;
+                    interrupt = 0;
                     break;
     
                 case START_FLUSH:
@@ -242,7 +262,17 @@ namespace soclib { namespace caba {
                     }
                     break;
     
+                case STOP_FLUSH_END_IMG:
+                    interrupt = 1;
+                    r_line = 0;
+                    r_pixel = 0;
+                    p_wb_master.STB_O = 0;
+                    p_wb_master.CYC_O = 0;
+                    p_wb_master.WE_O = 0;
+                    break;
+
                 case STOP_FLUSH:
+                    interrupt = 0;
                     p_wb_master.STB_O = 0;
                     p_wb_master.CYC_O = 0;
                     p_wb_master.WE_O = 0;
