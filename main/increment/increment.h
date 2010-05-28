@@ -8,6 +8,8 @@
 
 #include "../segmentation.h"
 #include "increment_hard.h"
+#include "interpolation.h"
+#include "buffer.h"
 
 namespace soclib { namespace caba {
 
@@ -16,6 +18,8 @@ namespace soclib { namespace caba {
         class Increment: public sc_core::sc_module{
             private:
                 soclib::caba::IncrementHard incrementHard;
+                soclib::caba::Interpolation interpolation;
+                soclib::caba::Buffer buffer;
                 sc_core::sc_in<bool>              dummy;
                 sc_core::sc_in<float>             dummy1;
 						protected:

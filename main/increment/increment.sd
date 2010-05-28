@@ -14,6 +14,8 @@ Module('caba:increment',
         uses = [
         Uses('caba:wishbone'),
         Uses('caba:increment_hard'),
+        Uses('caba:interpolation'),
+        Uses('caba:buffer'),
         ],
         debug = True ,
       )

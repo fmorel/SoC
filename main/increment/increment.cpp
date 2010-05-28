@@ -8,6 +8,8 @@ namespace soclib { namespace caba {
 		Increment<wb_param>::Increment(sc_core::sc_module_name insname)
 		: sc_core::sc_module(insname)
      ,incrementHard("increment hard")
+     ,interpolation("interpolation")
+     ,buffer("buffer")
 		{
 			std::cout << "WishBone increment"  << name() 
 				<< " created sucsesfully" << std::endl;
