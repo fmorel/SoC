@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "lm32_irq.h"
-#include "../segmentation.h"
+#include "segmentation.h"
 
 #define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
 

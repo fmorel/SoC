@@ -6,7 +6,7 @@
 #include "wb_slave.h"
 #include <stdint.h>
 
-#include "../segmentation.h"
+#include "segmentation.h"
 #include "increment_hard.h"
 #include "interpolation.h"
 #include "buffer.h"

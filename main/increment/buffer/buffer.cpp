@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "utils.h"
 #include <iostream>
 
 namespace soclib { namespace caba {
