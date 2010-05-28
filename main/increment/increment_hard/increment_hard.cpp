@@ -68,27 +68,26 @@ namespace soclib { namespace caba {
         newP1 = P1 + P0;
       }
     }
+
+    P0 = newP0;
+    P1 = newP1;
+    P2 = newP2;
+    P3 = newP3;
+    Q0 = newQ0;
+    Q1 = newQ1;
+    Q2 = newQ2;
+    Q3 = newQ3;
+    R0 = newR0;
+    R1 = newR1;
+    R2 = newR2;
+    S0 = newS0;
+    S1 = newS1;
+
   }
 
-  P0 = newP0;
-  P1 = newP1;
-  P2 = newP2;
-  P3 = newP3;
-  Q0 = newQ0;
-  Q1 = newQ1;
-  Q2 = newQ2;
-  Q3 = newQ3;
-  R0 = newR0;
-  R1 = newR1;
-  R2 = newR2;
-  S0 = newS0;
-  S1 = newS1;
-
-}
-
-void IncrementHard::incrementHardMoore() {
-  p_OUT = P3 ;
-}
+  void IncrementHard::incrementHardMoore() {
+    p_OUT = P3 ;
+  }
 
 }}
 
