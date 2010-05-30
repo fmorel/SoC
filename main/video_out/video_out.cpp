@@ -108,9 +108,6 @@ namespace soclib { namespace caba {
 					if (p_wb_master.ACK_I) {
 						data=p_wb_master.DAT_I.read();
 						//data is on 32 bits, we got 4 pixels here
-                        if(writingLine <= 1 && writingWord <= 10) {
-                            std::cout << "VIDEO_OUT:" << data << std::endl;
-                        }
 						lineBuffer[writingLine%BUFLINE][writingWord*4]=data>>24;
 						lineBuffer[writingLine%BUFLINE][writingWord*4+1]=(data>>16) & 0xff;
 						lineBuffer[writingLine%BUFLINE][writingWord*4+2]=(data>>8) & 0xff;
