@@ -283,23 +283,32 @@ namespace soclib { namespace caba {
                     interrupt = 0;
                     break;
     
-                case START_FLUSH:
+                case START_FLUSH: {
                     p_wb_master.STB_O = 1;
                     p_wb_master.CYC_O = 1;
                     p_wb_master.WE_O = 1;
                     p_wb_master.SEL_O = 0xF;
-                    p_wb_master.ADR_O = write_address;
-                    p_wb_master.DAT_O = *((int32_t*)(&buffer[r % BUFSIZE]));
+                    int32_t toto = (buffer[r % BUFSIZE + 0] << 24) +
+                                   (buffer[r % BUFSIZE + 1] << 16) +
+                                   (buffer[r % BUFSIZE + 2] << 8) +
+                                   (buffer[r % BUFSIZE + 3] << 0);
+                    p_wb_master.DAT_O = toto;
                     write_address += 4;
                     // We need to be sure that I_WIDTH % 4 == 0.
                     r_pixel = (r_pixel + 4) % I_WIDTH;
                     r_line = r_pixel == 0 ? r_line + 1 : r_line;
                     break;
+                }
     
                 case FLUSH:
                     if(p_wb_master.ACK_I) {
                         p_wb_master.ADR_O = write_address;
-                        p_wb_master.DAT_O = *((int32_t*)(&buffer[r % BUFSIZE]));
+                        int32_t toto = (buffer[r % BUFSIZE + 0] << 24) +
+                                       (buffer[r % BUFSIZE + 1] << 16) +
+                                       (buffer[r % BUFSIZE + 2] << 8) +
+                                       (buffer[r % BUFSIZE + 3] << 0);
+                                        
+                        p_wb_master.DAT_O = toto;
                         write_address += 4;
                         // We need to be sure that I_WIDTH % 4 == 0.
                         r_pixel = (r_pixel + 4) % I_WIDTH;
