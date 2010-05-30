@@ -5,8 +5,8 @@
 #include"wb_slave.h"
 #include"wb_master.h"
 
-#define I_WIDTH     640
-#define I_HEIGHT    480
+#include "utils.h"
+
 #define BUFLINES    10
 #define BUFSIZE    6400
 
@@ -58,7 +58,7 @@ namespace soclib { namespace caba {
             private:
                 uint32_t    master_state, slave_state;
 
-                char        buffer[BUFLINES * I_WIDTH];
+                char        buffer[BUFLINES * WIDTH];
                 int32_t     w_line, w_pixel, r_line, r_pixel;
 
                 uint32_t    start_address, write_address;
