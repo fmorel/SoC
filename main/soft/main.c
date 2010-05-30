@@ -73,7 +73,6 @@ int main(void) {
 //	printf("address :0x%x \n",(uint32_t)image);
 //	VIDEO_OUT=(uint32_t) image;
 
-
     VIDEO_IN = (uint32_t)image;
 
     while(!temp_var);
