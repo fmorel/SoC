@@ -39,6 +39,9 @@
 #define HEIGHT 480
 #define MODULO 16
 
+uint32_t image[HEIGHT][WIDTH] = { { 0 } };
+volatile int temp_var = 0;
+
 int damier(int i, int j) {
 	i = i % MODULO;
 	j *= 4;
@@ -49,9 +52,8 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
-volatile int myvar;
 void foo(void) {
-    myvar = 1;
+    temp_var = 1;
 }
 
 int main(void) {
@@ -60,27 +62,26 @@ int main(void) {
 
     RegisterIrqEntry(2, &foo);
 
+    int i,j;
 
-//    //mfixed A,B,C,D;
-//    int i,j;
-//		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
-//
-//		for (i=0;i<HEIGHT;i++) {
-//			for (j=0;j<WIDTH/4;j++) {
-//				image[i][j]=damier(i,j);
-//			}
+//	for (i=0;i<HEIGHT;i++) {
+//		for (j=0;j<WIDTH/4;j++) {
+//			image[i][j]=damier(i,j);
 //		}
-//	
+//	}
+	
 //	printf("address :0x%x \n",(uint32_t)image);
-//		VIDEO_OUT=(uint32_t) image;
-
-    myvar = 0;
-    VIDEO_IN = RAM_BASE + 0x10;
+//	VIDEO_OUT=(uint32_t) image;
 
 
-    while(myvar != 1) {}
+    VIDEO_IN = (uint32_t)image;
 
-    printf("yopyop\n");
+    while(!temp_var);
+
+    for(i = 0; i < 10; i++)
+        printf("0x%x\n", image[0][i]);
+
+    VIDEO_OUT = (uint32_t) image;
 
     getchar();
     return 0;

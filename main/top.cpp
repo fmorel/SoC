@@ -207,7 +207,7 @@ int _main(int argc, char *argv[])
         ////////////////////// Video_out ////////////////////////////
         ////////////////////////////////////////////////////////////
         soclib::caba::VideoOut<wb_param> video_out("video_out");
-        video_out.p_clk (signal_resetn);
+        video_out.p_clk (signal_clk);
         video_out.p_video_clk (signal_video_clk);
         video_out.p_resetn (signal_resetn);
         video_out.p_wb_slave (signal_video_out_slave);
@@ -220,6 +220,7 @@ int _main(int argc, char *argv[])
     // video_in
     soclib::caba::VideoIn<wb_param> video_in_w ("video_in_w") ;
     video_in_w.p_clk               (signal_clk);
+    video_in_w.p_video_clk         (signal_video_clk);
     video_in_w.p_resetn            (signal_resetn);
     video_in_w.line_valid          (line_valid);
     video_in_w.frame_valid         (frame_valid);
@@ -288,14 +289,14 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_clk,    "clk"    );
     sc_trace (TRACEFILE, signal_video_clk, "video_clk");
 //    sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
-//    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
+    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
     //sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
     //sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
     //sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
-    //sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
-//    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
-//    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
-//    sc_trace(TRACEFILE,pixel_out,"pixel_out");
+    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
+    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
+    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
+    sc_trace(TRACEFILE,pixel_out,"pixel_out");
     sc_trace(TRACEFILE,line_valid ,"line_valid ");
     sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
     sc_trace(TRACEFILE,pixel ,"pixel ");
