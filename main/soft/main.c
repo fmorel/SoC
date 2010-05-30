@@ -28,7 +28,10 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include "lm32_irq.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "Interrupts.h"
+#include "semphr.h"
 #include "segmentation.h"
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
@@ -41,50 +44,55 @@
 
 uint32_t image[HEIGHT][WIDTH] = { { 0 } };
 uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
-volatile int img_n = 0;
+
+/*
+   int damier(int i, int j) {
+   i = i % MODULO;
+   j *= 4;
+   j = j % MODULO;
+   if (i<MODULO/2 && j<MODULO/2) return 0xffffffff;
+   if (i>= MODULO/2 && j< MODULO/2) return 0;
+   if (i< MODULO/2 && j>= MODULO/2) return 0;
+   return 0xffffffff;
+   }
+ */
 volatile int lock = 0;
+xSemaphoreHandle xSemaphore;
+void foo(unsigned int intrLevel, void*pContext) {
+  lock = 1;
+  //static signed portBASE_TYPE xHigherPriorityTaskWoken; 
+  /* Unblock the task by releasing the semaphore. */
+  //xSemaphoreGiveFromISR( xSemaphore, &xHigherPriorityTaskWoken );
 
-int damier(int i, int j) {
-	i = i % MODULO;
-	j *= 4;
-	j = j % MODULO;
-	if (i<MODULO/2 && j<MODULO/2) return 0xffffffff;
-	if (i>= MODULO/2 && j< MODULO/2) return 0;
-	if (i< MODULO/2 && j>= MODULO/2) return 0;
-	return 0xffffffff;
+  /* If xHigherPriorityTaskWoken was set to true you
+     we should yield.  The actual macro used here is 
+     port specific. */
+  //portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+
 }
 
-void foo(void) {
-    lock = 1;
-}
+void main_task(void *parameters) {
+  int i;
 
+  RegisterISR(2,NULL, &foo);
+
+  for(i = 0;; i++) {
+    VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+   // xSemaphoreTake( xSemaphore, portMAX_DELAY );
+    while(!lock);
+    lock = 0;
+    VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+
+  }
+
+  getchar();
+}
 int main(void) {
-
-    irq_enable();
-
-    RegisterIrqEntry(2, &foo);
-
-    int i,j;
-
-//	for (i=0;i<HEIGHT;i++) {
-//		for (j=0;j<WIDTH/4;j++) {
-//			image[i][j]=damier(i,j);
-//		}
-//	}
-	
-//	printf("address :0x%x \n",(uint32_t)image);
-//	VIDEO_OUT=(uint32_t) image;
-
-    for(i = 0; i < 5; i++) {
-        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-        while(!lock);
-        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-        lock = 0;
-
-    }
-
-    getchar();
-    return 0;
+  xTaskHandle my_task;
+  vSemaphoreCreateBinary(xSemaphore);
+  xTaskCreate(&main_task, (const signed char*)"test task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,&my_task);
+  vTaskStartScheduler();
+  return 0;
 }
 
 

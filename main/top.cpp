@@ -24,7 +24,7 @@
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
 #include "display.h"
-#define DO_TRACES 1
+//#define DO_TRACES
 
 // C/C++ std libs
 #include <iostream>
@@ -56,6 +56,7 @@
 #include "video_gen.h"
 #include "video_in.h"
 #include "video_out.h"
+#include "wb_timer.h"
 
 
 // real SystemC main
@@ -82,6 +83,7 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("video_out_slave", VIDEO_OUT_BASE, VIDEO_OUT_SIZE, IntTab(3), false));
         
     maptab.add(Segment("video_in"  , VIDEO_IN_BASE  , VIDEO_IN_SIZE  , IntTab(4), false));
+    maptab.add(Segment("wb_timer"  , WBT_BASE  , WBT_SIZE  , IntTab(5), false));
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
@@ -107,6 +109,7 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_wb_ram("signal_wb_ram");
     soclib::caba::WbSignal<wb_param> signal_wb_rom("signal_wb_rom");
     soclib::caba::WbSignal<wb_param> signal_wb_tty("signal_wb_tty");
+    soclib::caba::WbSignal<wb_param> signal_wb_timer("signal_wb_timer");
     //WB slave    
     soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
     //WB master
@@ -122,7 +125,8 @@ int _main(int argc, char *argv[])
 
     // irq from uart
     sc_signal<bool> signal_tty_irq("signal_tty_irq");
-    
+    //irq from timer
+    sc_signal<bool> signal_timer_irq("signal_timer_irq");
     //irq from video_out
     sc_signal<bool> signal_video_out_irq("video_out_irq");
     //irq from video_in
@@ -156,7 +160,16 @@ int _main(int argc, char *argv[])
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 3,5);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 3,6);
+
+
+    //WB timer for FreeRTOS
+    soclib::caba::WbTimer<wb_param> timer ("WB_timer");
+    timer.p_clk                   (signal_clk);
+    timer.p_resetn                (signal_resetn);
+    timer.p_wb                    (signal_wb_timer);
+    timer.p_S_INT_O               (signal_timer_irq);
+
 
     //VideoGen
     soclib::caba::VideoGen my_videogen ("video_gen");
@@ -244,6 +257,7 @@ int _main(int argc, char *argv[])
     wbinterco.p_to_slave[2](signal_wb_tty);
     wbinterco.p_to_slave[3](signal_video_out_slave);
     wbinterco.p_to_slave[4](signal_wb_video_in_slave);
+    wbinterco.p_to_slave[5](signal_wb_timer);
 
     // lm32
     lm32.p_clk(signal_clk);
@@ -255,7 +269,9 @@ int _main(int argc, char *argv[])
     lm32.p_irq[0] (signal_tty_irq);
     lm32.p_irq[1] (signal_video_out_irq);
     lm32.p_irq[2] (signal_video_in_irq);
-    for (int i=3; i<32; i++)
+    //TIMER_IRQ should be 3 in Timer.h
+    lm32.p_irq[TIMER_IRQ] (signal_timer_irq);
+    for (int i=4; i<32; i++)
         lm32.p_irq[i] (unconnected_irq);
 
     ////////////////////////////////////////////////////////////
