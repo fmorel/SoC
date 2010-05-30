@@ -43,7 +43,7 @@ namespace soclib { namespace caba {
             frame_valid_temp    = frame_valid;
             p_video_clk_temp    = p_video_clk;
             video_clk_rising    = !p_video_clk_temp && p_video_clk;
-            pixel_temp = pixel_in;
+//            pixel_temp = pixel_in;
             count++;
         }
 
@@ -146,7 +146,7 @@ namespace soclib { namespace caba {
                 case WAIT:
                     // If there is at least one line loaded in the buffer,
                     // start flushing.
-                    if(w - r > I_WIDTH || (w == 0 && r > 0)) {
+                    if(w - r >= I_WIDTH || (w == 0 && r > 0)) {
                         next_state = START_FLUSH;
                     } else {
                         next_state = WAIT;
@@ -225,8 +225,8 @@ namespace soclib { namespace caba {
                     // Coming from ACK_AND_WAIT_FRAME, we set ACK_O to 0.
                     p_wb_slave.ACK_O = 0;
                     count = 0;
-                    if(frame_valid && video_clk_rising) {
-                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_temp;
+                    if(frame_valid && line_valid && video_clk_rising) {
+                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_in;
                         w_pixel = (w_pixel + 1) % I_WIDTH;
                         w_line = w_pixel == 0 ? (w_line + 1) % I_HEIGHT : w_line;
                     } else {
@@ -238,7 +238,7 @@ namespace soclib { namespace caba {
                 case WAIT_LINE:
                     count = 0;
                     if(line_valid && video_clk_rising) {
-                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_temp;
+                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_in;
                         w_pixel = (w_pixel + 1) % I_WIDTH;
                         w_line = w_pixel == 0 ? (w_line + 1) % I_HEIGHT : w_line;
                     }
@@ -249,7 +249,7 @@ namespace soclib { namespace caba {
                     // We sample every 4 clocks.
 //                    if(count % 4 == 0) {
                     if(video_clk_rising) {
-                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_temp;
+                        buffer[(I_WIDTH * w_line + w_pixel) % (I_WIDTH * BUFLINES)] = pixel_in;
                         w_pixel = (w_pixel + 1) % I_WIDTH;
                         w_line = w_pixel == 0 ? (w_line + 1) % I_HEIGHT : w_line;
                     }
@@ -284,6 +284,7 @@ namespace soclib { namespace caba {
                     break;
     
                 case START_FLUSH: {
+                    p_wb_master.ADR_O = write_address;
                     p_wb_master.STB_O = 1;
                     p_wb_master.CYC_O = 1;
                     p_wb_master.WE_O = 1;

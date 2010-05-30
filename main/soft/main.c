@@ -77,9 +77,6 @@ int main(void) {
 
     while(!temp_var);
 
-    for(i = 0; i < 10; i++)
-        printf("0x%x\n", image[0][i]);
-
     VIDEO_OUT = (uint32_t) image;
 
     getchar();
