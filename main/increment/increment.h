@@ -20,8 +20,12 @@ namespace soclib { namespace caba {
                 soclib::caba::IncrementHard incrementHard;
                 soclib::caba::Interpolation interpolation;
                 soclib::caba::Buffer buffer;
-                sc_core::sc_in<bool>              dummy;
-                sc_core::sc_in<float>             dummy1;
+                sc_signal<float> dummy_float,dummy_float1;
+                sc_signal<bool> dummy_bool;
+                sc_signal<unsigned char> dummy_uchar[4];
+                sc_signal<uint32_t> dummy_uint32;
+                sc_signal<uint32_t> dummy_uint32_t[2];
+                sc_signal<unsigned char> dummy_out;
 						protected:
                 SC_HAS_PROCESS(Increment);
             public:

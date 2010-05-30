@@ -20,7 +20,7 @@ namespace soclib { namespace caba {
                 sc_core::sc_out<unsigned char>    out;
 
                 sc_core::sc_in<unsigned char>     buffer_in[4];
-                sc_core::sc_out<int>              buffer_command[2];
+                sc_core::sc_out<uint32_t>              buffer_command[2];
                 // constructor
                 Interpolation (sc_core::sc_module_name insname);
 

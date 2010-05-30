@@ -20,7 +20,7 @@ namespace soclib { namespace caba {
 
                 //Reading the buffer
                 sc_core::sc_out<unsigned char>    buffer_out[4];
-                sc_core::sc_in<int>               buffer_command_out[2];
+                sc_core::sc_in<uint32_t>               buffer_command_out[2];
 
                 //Writing to the buffer
                 sc_core::sc_in<uint32_t>           buffer_in;

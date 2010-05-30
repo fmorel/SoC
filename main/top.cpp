@@ -52,10 +52,10 @@
 #include "segmentation.h"
 #include "video_gen.h"
 
-#include "increment.h"
 
 //Wb simple slave
 #include "video_out.h"
+#include "increment.h"
 
 
 // real SystemC main
@@ -183,10 +183,9 @@ int _main(int argc, char *argv[])
 		soclib::caba::Increment<wb_param> increment("increment");
 		increment.p_clk (signal_clk);
 		increment.p_resetn (signal_resetn);
-		increment.p_wb_slave (signal_video_out_slave);
-		increment.p_wb_master (signal_video_out_master);
+	  increment.p_wb_slave (signal_increment_slave);
+		increment.p_wb_master (signal_increment_master);
 
-    soclib::caba::IncrementHard incrhard("toto");
     ////////////////////////////////////////////////////////////
     /////////////////// WB -> VCI Wrappers /////////////////////
     ////////////////////////////////////////////////////////////

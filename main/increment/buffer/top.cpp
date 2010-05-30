@@ -24,7 +24,7 @@ int _main(int argc, char* argv[]) {
 
   //Reading the buffer
   sc_signal<unsigned char>    buffer_out[4];
-  sc_signal<int>               buffer_command_out[2];
+  sc_signal<uint32_t>               buffer_command_out[2];
 
   //Writing to the buffer
   sc_signal<uint32_t>           buffer_in;
