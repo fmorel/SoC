@@ -11,6 +11,9 @@ SOFT_IMAGE = soft.elf
 
 OBJS  =  main.o lm32_irq.o
 
+ROOT_DIR = ..
+CFLAGS+= -I$(ROOT_DIR)
+
 .PHONY: all clean
 
 all:$(SOFT_IMAGE)

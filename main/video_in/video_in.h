@@ -46,7 +46,6 @@ namespace soclib { namespace caba {
 
                 // Functions.
                 void sample();
-                void sample_video();
 
                 void masterTransition();
                 void masterMoore();

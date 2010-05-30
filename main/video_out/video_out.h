@@ -6,8 +6,8 @@
 #include "wb_slave.h"
 #include <stdint.h>
 
-#include "../segmentation.h"
-#include "../utils.h"
+#include "segmentation.h"
+#include "utils.h"
 
 //state of the master FSM
 #define MASTER_IDLE 0

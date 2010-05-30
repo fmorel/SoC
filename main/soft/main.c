@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "lm32_irq.h"
-#include "../segmentation.h"
+#include "segmentation.h"
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
@@ -40,7 +40,9 @@
 #define MODULO 16
 
 uint32_t image[HEIGHT][WIDTH] = { { 0 } };
-volatile int temp_var = 0;
+uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
+volatile int img_n = 0;
+volatile int lock = 0;
 
 int damier(int i, int j) {
 	i = i % MODULO;
@@ -53,7 +55,7 @@ int damier(int i, int j) {
 }
 
 void foo(void) {
-    temp_var = 1;
+    lock = 1;
 }
 
 int main(void) {
@@ -73,11 +75,13 @@ int main(void) {
 //	printf("address :0x%x \n",(uint32_t)image);
 //	VIDEO_OUT=(uint32_t) image;
 
-    VIDEO_IN = (uint32_t)image;
+    for(i = 0; i < 5; i++) {
+        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+        while(!lock);
+        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+        lock = 0;
 
-    while(!temp_var);
-
-    VIDEO_OUT = (uint32_t) image;
+    }
 
     getchar();
     return 0;
