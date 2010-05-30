@@ -5,32 +5,11 @@
 #include"wb_slave.h"
 #include"wb_master.h"
 
-#define PIXEL_BUFFER_SIZE 1280
-
 #define I_WIDTH     640
 #define I_HEIGHT    480
 #define BUFLINES    10
 #define BUFSIZE    6400
 
-//enum PixelBufferStates {
-//    UNDEFINED = -1,
-//    EMPTY,
-//    FULL,
-//    FREE,
-//    USED
-//};
-//
-//struct PixelBuffer {
-//    int state;
-//    char* r, w;
-//    char buffer[PIXEL_BUFFER_SIZE];
-//
-//    void reset() {
-//        state = EMPTY;
-//        r = buffer;
-//        w = buffer;
-//    }
-//};
 
 namespace soclib { namespace caba {
 
@@ -43,6 +22,7 @@ namespace soclib { namespace caba {
             
             public:
                 sc_core::sc_in<bool>    p_clk;
+                sc_core::sc_in<bool>    p_video_clk;
                 sc_core::sc_in<bool>    p_resetn;
 
                 // Inputs from video_gen.
@@ -53,6 +33,7 @@ namespace soclib { namespace caba {
                 // Interrupt signal.
                 sc_out<bool>            interrupt;
 
+                sc_signal<bool>         p_video_clk_temp;
                 sc_signal<bool>         line_valid_temp;
                 sc_signal<bool>         frame_valid_temp;
 
@@ -65,6 +46,7 @@ namespace soclib { namespace caba {
 
                 // Functions.
                 void sample();
+                void sample_video();
 
                 void masterTransition();
                 void masterMoore();
@@ -85,6 +67,8 @@ namespace soclib { namespace caba {
 
                 char        pixel_temp;
 
+                bool        video_clk_rising;
+
                 enum states {
                     UNDEFINED,
                     // Master states.
@@ -98,6 +82,7 @@ namespace soclib { namespace caba {
                     ACK_READ,
                     ACK_AND_WAIT_FRAME,
                     WAIT_FRAME,
+                    WAIT_LINE,
                     RECEIVE
                 };
         };
