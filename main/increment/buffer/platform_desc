@@ -1,0 +1,8 @@
+# -*- python -*-
+
+todo = Platform('caba', 'top.cpp',
+        uses = [
+				Uses('caba:buffer'),
+        ],
+        )
+
