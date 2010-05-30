@@ -30,6 +30,7 @@ OBJS   += $(FREERTOS_OBJS)
 PRINTF_DIR = ../../my_printf/
 
 VPATH += $(PRINTF_DIR)
+OBJS  += my_printf.o
 CFLAGS += -I$(PRINTF_DIR)
 
 
