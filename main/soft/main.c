@@ -31,12 +31,18 @@
 #include "lm32_irq.h"
 #include "segmentation.h"
 
-#define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
+#define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
+#define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
 
 //in word (4 bytes)
 #define WIDTH 160
 #define HEIGHT 480
 #define MODULO 16
+
+uint32_t image[HEIGHT][WIDTH] = { { 0 } };
+uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
+volatile int img_n = 0;
+volatile int lock = 0;
 
 int damier(int i, int j) {
 	i = i % MODULO;
@@ -48,24 +54,35 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
-#include "initial_polys.h"
-int main(void)
-{
-    int i,j;
-//		static uint32_t image[HEIGHT][WIDTH] = { { 0 } };
-/*
-		for (i=0;i<HEIGHT;i++) {
-			for (j=0;j<WIDTH/4;j++) {
-				image[i][j]=damier(i,j);
-			}
-		}
-	
-   */
-	//printf("address :0x%x \n",(uint32_t)image);
-  //		VIDEO_OUT=(uint32_t) image;
-//    print_a();
-    calc_polys();
 
+void foo(void) {
+    lock = 1;
+}
+
+int main(void) {
+
+    irq_enable();
+
+    RegisterIrqEntry(2, &foo);
+
+    int i,j;
+
+//	for (i=0;i<HEIGHT;i++) {
+//		for (j=0;j<WIDTH/4;j++) {
+//			image[i][j]=damier(i,j);
+//		}
+//	}
+	
+//	printf("address :0x%x \n",(uint32_t)image);
+//	VIDEO_OUT=(uint32_t) image;
+
+    for(i = 0; i < 5; i++) {
+        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+        while(!lock);
+        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+        lock = 0;
+
+    }
 
     getchar();
     return 0;

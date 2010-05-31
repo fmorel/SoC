@@ -28,6 +28,7 @@ namespace soclib { namespace caba {
       read_buffer = 1 - read_buffer;
     } 
 
+
     if (buffer_write_enable) {
       uint32_t temp = buffer_in.read();
       buf[1-read_buffer][counter/ANTE_TILE_SIZE][counter%ANTE_TILE_SIZE]         = temp >> 24 & 0xff;
@@ -43,10 +44,12 @@ namespace soclib { namespace caba {
     int x = buffer_command_out[0];
     int y = buffer_command_out[1];
 
+
     buffer_out[0] = buf[read_buffer][x][y];
     buffer_out[1] = buf[read_buffer][x+1][y];
     buffer_out[2] = buf[read_buffer][x][y+1];
     buffer_out[3] = buf[read_buffer][x+1][y+1];
+
 
 
   }
