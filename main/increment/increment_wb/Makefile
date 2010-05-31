@@ -1,6 +1,8 @@
 SYSTEMC		= /comelec/softs/opt/systemc-2.2.0
 TARGET_ARCH	= linux64
 
+SOCLIB_PATH = /comelec/softs/opt/www.soclib.fr/distrib/soclib
+
 CXX         = g++
 LD	    = g++
 CXXFLAGS    = -Wall  -I. -I$(SYSTEMC)/include  -Wno-deprecated -O2 -g
@@ -18,7 +20,7 @@ $(EXE) : $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o $@  -lsystemc -lpng 2>&1 | c++filt
 
 .cpp.o: .deps
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -I$(SOCLIB_PATH)/soclib/communication/wishbone/caba/source/include/ -c -o $@ $<
 
 .c.o: .deps
 	$(CC) $(CFLAGS) -c -o $@ $<
