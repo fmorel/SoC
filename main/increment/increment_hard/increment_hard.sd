@@ -1,0 +1,13 @@
+Module('caba:increment_hard',
+        classname = 'soclib::caba::IncrementHard',
+        header_files = ['increment_hard.h',],
+        implementation_files = ['increment_hard.cpp',],
+        ports = [
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+            # put all the ports for R0,P0...
+            # put all the ports for mux control
+        ],
+        debug = True ,
+      )
+

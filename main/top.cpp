@@ -52,11 +52,13 @@
 #include "segmentation.h"
 
 
+
 // --- Modules ---
 #include "video_gen.h"
 #include "video_in.h"
 #include "video_out.h"
 #include "wb_timer.h"
+#include "increment.h"
 
 
 // real SystemC main
@@ -112,13 +114,21 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_wb_timer("signal_wb_timer");
     //WB slave    
     soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
-    //WB master
-    soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
-        
-    //video signals
-    sc_signal<bool> frame_valid_out("frame_valid_out");
-    sc_signal<bool> line_valid_out("line_valid_out");
-    sc_signal<unsigned char> pixel_out("pixel_out");
+		//WB master
+		soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
+		
+
+		//WB slave	
+    soclib::caba::WbSignal<wb_param> signal_increment_slave("signal_increment_slave");
+		//WB master
+		soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
+
+
+
+		//video signals
+		sc_signal<bool> frame_valid_out("frame_valid_out");
+		sc_signal<bool> line_valid_out("line_valid_out");
+		sc_signal<unsigned char> pixel_out("pixel_out");
 
     soclib::caba::WbSignal<wb_param> signal_wb_video_in_slave("signal_wb_video_in_slave");
     soclib::caba::WbSignal<wb_param> signal_wb_video_in_master("signal_wb_video_in_master");
@@ -190,6 +200,12 @@ int _main(int argc, char *argv[])
     my_display.frame_valid(frame_valid_out);
     my_display.pixel_in(pixel_out);
 
+    //Increment
+		soclib::caba::Increment<wb_param> increment("increment");
+		increment.p_clk (signal_clk);
+		increment.p_resetn (signal_resetn);
+	  increment.p_wb_slave (signal_increment_slave);
+		increment.p_wb_master (signal_increment_master);
 
     ////////////////////////////////////////////////////////////
     /////////////////// WB -> VCI Wrappers /////////////////////

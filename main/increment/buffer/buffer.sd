@@ -1,0 +1,13 @@
+Module('caba:buffer',
+        classname = 'soclib::caba::Buffer',
+        header_files = ['buffer.h',],
+        implementation_files = ['buffer.cpp',],
+        ports = [
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+        ],
+        uses = [
+        ],
+        debug = True ,
+      )
+

@@ -1,0 +1,22 @@
+Module('caba:increment',
+        classname = 'soclib::caba::Increment',
+        tmpl_parameters = [
+            parameter.Module('wb_param',  default = 'caba:wb_param'),
+        ],
+        header_files = ['increment.h',],
+        implementation_files = ['increment.cpp',],
+        ports = [
+            Port('caba:wb_slave', 'p_wb_slave'),
+						Port('caba:wb_master','p_wb_master'),
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+        ],
+        uses = [
+        Uses('caba:wishbone'),
+        Uses('caba:increment_hard'),
+        Uses('caba:interpolation'),
+        Uses('caba:buffer'),
+        ],
+        debug = True ,
+      )
+

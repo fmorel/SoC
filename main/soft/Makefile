@@ -9,7 +9,13 @@ CPPFLAGS     = -I. -Isrc
 
 SOFT_IMAGE = soft.elf
 
-OBJS  =  main.o
+OBJS  =  main.o initial_polys.o
+
+
+PRINTF_DIR = ../../my_printf/
+OBJS += my_printf.o
+VPATH += $(PRINTF_DIR)
+CFLAGS += -I$(PRINTF_DIR)
 
 ROOT_DIR = ..
 CFLAGS+= -I$(ROOT_DIR)
