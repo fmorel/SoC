@@ -24,7 +24,7 @@
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
 #include "display.h"
-#define DO_TRACES 1
+//#define DO_TRACES
 
 // C/C++ std libs
 #include <iostream>
