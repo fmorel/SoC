@@ -9,7 +9,7 @@ CPPFLAGS     = -I. -Isrc
 
 SOFT_IMAGE = soft.elf
 
-OBJS  =  main.o initial_polys.o
+OBJS  =  main.o initial_polys.o lm32_irq.o
 
 
 PRINTF_DIR = ../../my_printf/
