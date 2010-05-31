@@ -67,7 +67,7 @@ extern "C" {
 	typedef unsigned portLONG portTickType;
 	#define portMAX_DELAY ( portTickType ) 0xffffffff
 #endif
-
+#define portTICK_RATE_MS ( ( portTickType ) 1000 / configTICK_RATE_HZ )
 /*-----------------------------------------------------------*/	
 
 #define portDISABLE_INTERRUPTS()	asm volatile ("wcsr   ie, r0");

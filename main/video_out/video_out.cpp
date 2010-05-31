@@ -62,6 +62,7 @@ namespace soclib { namespace caba {
 					p_wb_slave.ACK_O=1;
 					if (p_wb_slave.WE_I)
 						address=p_wb_slave.DAT_I.read();
+            std::cout << "VIDEO_OUT : Got address : " << address << std::endl;
 					p_wb_slave.DAT_O=address;
 			}
 		}

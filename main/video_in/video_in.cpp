@@ -294,6 +294,7 @@ namespace soclib { namespace caba {
                     break;
     
                 case STOP_FLUSH_END_IMG:
+                    std::cout << "VIDEO_IN: INTERRUPT !!" << std::endl;
                     interrupt = 1;
                     r_line = 0;
                     r_pixel = 0;

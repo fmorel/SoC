@@ -24,7 +24,7 @@
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
 #include "display.h"
-//#define DO_TRACES
+#define DO_TRACES
 
 // C/C++ std libs
 #include <iostream>
@@ -282,12 +282,11 @@ int _main(int argc, char *argv[])
     // !! the real LM32 irq are active low
     // To avoid adding inverters here, we consider
     // them active high
-    lm32.p_irq[0] (signal_tty_irq);
+    //TIMER_IRQ should be 0 in Timer.h
+    lm32.p_irq[TIMER_IRQ] (signal_timer_irq);
     lm32.p_irq[1] (signal_video_out_irq);
     lm32.p_irq[2] (signal_video_in_irq);
-    //TIMER_IRQ should be 3 in Timer.h
-    lm32.p_irq[TIMER_IRQ] (signal_timer_irq);
-    for (int i=4; i<32; i++)
+    for (int i=3; i<32; i++)
         lm32.p_irq[i] (unconnected_irq);
 
     ////////////////////////////////////////////////////////////
@@ -316,26 +315,26 @@ int _main(int argc, char *argv[])
 
 #ifdef DO_TRACES
     sc_trace_file *TRACEFILE;
-    TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
-    sc_trace (TRACEFILE, signal_resetn, "resetn" );
+    TRACEFILE = sc_create_vcd_trace_file("/tmp/vcd_traces");
+ //   sc_trace (TRACEFILE, signal_resetn, "resetn" );
     sc_trace (TRACEFILE, signal_clk,    "clk"    );
-    sc_trace (TRACEFILE, signal_video_clk, "video_clk");
+ //   sc_trace (TRACEFILE, signal_video_clk, "video_clk");
 //    sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
-    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
+//    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
     //sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
     //sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
     //sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
-    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
-    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
-    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
-    sc_trace(TRACEFILE,pixel_out,"pixel_out");
-    sc_trace(TRACEFILE,line_valid ,"line_valid ");
-    sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
-    sc_trace(TRACEFILE,pixel ,"pixel ");
+ //   sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
+ //   sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
+ //   sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
+ //   sc_trace(TRACEFILE,pixel_out,"pixel_out");
+ //   sc_trace(TRACEFILE,line_valid ,"line_valid ");
+ //   sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
+ //   sc_trace(TRACEFILE,pixel ,"pixel ");
         
     sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
-    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
-    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
+ //   sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
+ //   sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
 #endif
 
     ////////////////////////////////////////////////////////////

@@ -33,6 +33,7 @@
 #include "Interrupts.h"
 #include "semphr.h"
 #include "segmentation.h"
+#include "my_printf.h"
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
@@ -56,20 +57,17 @@ uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
    return 0xffffffff;
    }
  */
-volatile int lock = 0;
 xSemaphoreHandle xSemaphore;
+portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE; 
+volatile int lock = 0;
 void foo(unsigned int intrLevel, void*pContext) {
-  my_printf("Yoo!");
   lock = 1;
-  static signed portBASE_TYPE xHigherPriorityTaskWoken; 
   /* Unblock the task by releasing the semaphore. */
-  xSemaphoreGiveFromISR( xSemaphore, &xHigherPriorityTaskWoken );
+  xHigherPriorityTaskWoken = xSemaphoreGiveFromISR( xSemaphore, pdFALSE );
 
   /* If xHigherPriorityTaskWoken was set to true you
      we should yield.  The actual macro used here is 
      port specific. */
-  //portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-
   if( xHigherPriorityTaskWoken )  vPortYield();
 
 }
@@ -78,17 +76,16 @@ void main_task(void *parameters) {
   int i;
 
   RegisterISR(2,NULL, &foo);
-  xSemaphoreTake( xSemaphore, portMAX_DELAY );
 
   for(i = 0;; i++) {
+    portBASE_TYPE check;
+    my_printf("Trytask\n\r");
     VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-    my_printf("Trying\n\r");
-    while(!lock);
-    my_printf("lockTaken\n\r");
-    xSemaphoreTake( xSemaphore, portMAX_DELAY );
-    my_printf("SemTaken\n\r");
+    check = xSemaphoreTake( xSemaphore, portMAX_DELAY );
+    while (!lock) {}
     lock = 0;
     VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+    my_printf("SemTaken : %d\n\r",check);
 
   }
 
@@ -96,7 +93,11 @@ void main_task(void *parameters) {
 }
 int main(void) {
   xTaskHandle my_task;
-  vSemaphoreCreateBinary(xSemaphore);
+  xSemaphore = xQueueCreate( ( unsigned portBASE_TYPE ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH );	
+  if (xSemaphore == NULL) {
+    my_printf("Semaphore creation failed.\n\r");
+    return 0;
+  }
   xTaskCreate(&main_task, (const signed char*)"test task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,&my_task);
   vTaskStartScheduler();
   return 0;

@@ -13,7 +13,7 @@
 
 #define TIMER_BASE 0xA0000600
 #define TIMER_SIZE 0x00000100
-#define TIMER_IRQ  3
+#define TIMER_IRQ  0
 
 typedef struct {
   volatile uint32_t Status;
