@@ -42,7 +42,8 @@
 uint32_t image[HEIGHT][WIDTH] = { { 0 } };
 uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
 volatile int img_n = 0;
-volatile int lock = 0;
+volatile int lock_video_in = 0;
+volatile int lock_video_out = 0;
 
 int damier(int i, int j) {
 	i = i % MODULO;
@@ -54,34 +55,65 @@ int damier(int i, int j) {
 	return 0xffffffff;
 }
 
-void foo(void) {
-    lock = 1;
+void video_out_handler() {
+    lock_video_out = 1;
+    my_printf("VIDEO_OUT: interrupt\n\r");
+}
+
+void video_in_handler() {
+    lock_video_in = 1;
 }
 
 int main(void) {
 
     irq_enable();
 
-    RegisterIrqEntry(2, &foo);
+    RegisterIrqEntry(1, &video_out_handler);
+    RegisterIrqEntry(2, &video_in_handler);
 
     int i,j;
 
-//	for (i=0;i<HEIGHT;i++) {
-//		for (j=0;j<WIDTH/4;j++) {
-//			image[i][j]=damier(i,j);
-//		}
-//	}
+	for (i=0;i<HEIGHT;i++) {
+		for (j=0;j<WIDTH/4;j++) {
+			image[i][j]=damier(i,j);
+		}
+	}
 	
-//	printf("address :0x%x \n",(uint32_t)image);
-//	VIDEO_OUT=(uint32_t) image;
+//    lock_video_out = 1;
+//    for(i = 0; i < 5; i++) {
+//        while(!lock_video_out);
+//        my_printf("Sending %i\n\r", i);
+//        lock_video_out = 0;
+//        VIDEO_OUT = (uint32_t)image;
+//    }
+//    my_printf("Done\n");
 
-    for(i = 0; i < 5; i++) {
-        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-        while(!lock);
-        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-        lock = 0;
 
+    int toto = 1;
+
+    lock_video_in = 1;
+    lock_video_out = 1;
+    for (i=0; i < 10; i++) {
+        while(!lock_video_in && !lock_video_out);
+        if(lock_video_in) {
+            toto = !toto;
+            lock_video_in = 0;
+            VIDEO_IN = toto ? (uint32_t)image : (uint32_t)image2;
+        }
+        if(lock_video_out) {
+            lock_video_out = 0;
+            VIDEO_OUT = !toto ? (uint32_t)image : (uint32_t)image2;
+        }
     }
+
+//    // Test video_in
+//    for(i = 0; i < 5; i++) {
+//        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+//        while(!lock_video_out);
+//        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
+//        lock = 0;
+//
+//    }
 
     getchar();
     return 0;

@@ -14,6 +14,10 @@ OBJS  =  main.o lm32_irq.o
 ROOT_DIR = ..
 CFLAGS+= -I$(ROOT_DIR)
 
+MYPRINTF_DIR = ../../my_printf
+OBJS+= my_printf.o
+CPPFLAGS+= -I$(MYPRINTF_DIR)
+
 .PHONY: all clean
 
 all:$(SOFT_IMAGE)

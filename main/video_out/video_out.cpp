@@ -86,7 +86,6 @@ namespace soclib { namespace caba {
 
 				//waits for address to be set
 				case MASTER_IDLE:
-					p_interrupt=0;
 					// if address is not null
 					if (address) {
 						masterState=MASTER_BEGINLINE;
@@ -130,7 +129,6 @@ namespace soclib { namespace caba {
 				
 				//send an interrut and reset the address register when transmission has ended
 				case MASTER_ENDOFTRANS:
-					p_interrupt=1;
 					masterState=MASTER_IDLE;
 					address=0;
 				}
@@ -189,7 +187,7 @@ namespace soclib { namespace caba {
 					//we need to check end of frame here so that frame_valid and line_valid resets at the same cycle
 					if (outputLine== HEIGHT-1) {
 						outputLine++;
-						nextOutputState=OUTPUT_WAITFRAME;
+						nextOutputState=OUTPUT_WAITFRAME1;
 					}
 				}
 				break;
@@ -205,12 +203,24 @@ namespace soclib { namespace caba {
 				break;
 			
 			//wait (at least) for FRAME_SYNC cycles before  new frame
-			case OUTPUT_WAITFRAME:
+            //set the interrupt at 1 in middle of FRAME_SYNC
+            //this gives time to  the LM32 ...
+			case OUTPUT_WAITFRAME1:
 				cycle_count++;
-				if (cycle_count==FRAME_SYNC) {
-					nextOutputState=OUTPUT_IDLE;
-					outputLine=0;
+				if (cycle_count==2) {
+					nextOutputState=OUTPUT_WAITFRAME2;
+                    p_interrupt=1;
+                    outputLine=0;
 				}
+                break;
+
+            case OUTPUT_WAITFRAME2:
+                cycle_count++;
+                p_interrupt=0;
+                if (cycle_count == FRAME_SYNC) 
+                    nextOutputState=OUTPUT_IDLE;
+                
+
 		}
 
 		if (p_resetn==false) {
@@ -232,7 +242,7 @@ namespace soclib { namespace caba {
 				p_line_valid=0;
 				break;
 
-			case OUTPUT_WAITFRAME:
+			case OUTPUT_WAITFRAME1:
 				p_line_valid=0;
 				p_frame_valid=0;
 				break;
