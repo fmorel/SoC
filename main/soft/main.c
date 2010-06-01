@@ -58,37 +58,18 @@ uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
    }
  */
 xSemaphoreHandle xSemaphore;
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE; 
-volatile int lock = 0;
-volatile int count = 0;
 void foo(unsigned int intrLevel, void*pContext) {
-  lock = 1;
-  count ++;
   /* Unblock the task by releasing the semaphore. */
-  xHigherPriorityTaskWoken = xSemaphoreGiveFromISR( xSemaphore, pdFALSE );
-
-  /* If xHigherPriorityTaskWoken was set to true you
-     we should yield.  The actual macro used here is 
-     port specific. */
-//  if( xHigherPriorityTaskWoken )  vPortYield();
-
+  xSemaphoreGiveFromISR( xSemaphore, pdFALSE );
 }
 
 void main_task(void *parameters) {
-
-  int i;
+  int i ;
 
   for(i = 0;; i++) {
-    portBASE_TYPE check;
     VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-    VIDEO_IN = (uint32_t)image;
-    my_printf("TrySem\n\r");
     xSemaphoreTake( xSemaphore, portMAX_DELAY );
-    //while (!lock) {}
-    lock = 0;
     VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-    my_printf("SemTaken\n\r");
-
   }
 
   getchar();
