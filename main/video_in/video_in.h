@@ -7,8 +7,9 @@
 
 #include "utils.h"
 
-#define BUFLINES    10
-#define BUFSIZE    6400
+#define BUFLINES        2
+#define BUFSIZE         1280 
+#define MINFLUSHSIZE    32
 
 
 namespace soclib { namespace caba {

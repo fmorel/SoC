@@ -292,20 +292,20 @@ int _main(int argc, char *argv[])
     sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
 //    sc_trace(TRACEFILE,pixel ,"pixel ");
 //    sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
-//    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
-    //sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
-    //sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
-    //sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
-    sc_trace (TRACEFILE, signal_video_out_slave, "video_out_slave");
-    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
-    sc_trace (TRACEFILE, signal_video_out_irq, "video_out_irq" );
-    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
-    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
-    sc_trace(TRACEFILE,pixel_out,"pixel_out");
+    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
+//    sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
+//    sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
+//    sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
+//    sc_trace (TRACEFILE, signal_video_out_slave, "video_out_slave");
+//    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
+//    sc_trace (TRACEFILE, signal_video_out_irq, "video_out_irq" );
+//    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
+//    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
+//    sc_trace(TRACEFILE,pixel_out,"pixel_out");
         
     sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
-//    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
-//    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
+    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
+    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
 #endif
 
     ////////////////////////////////////////////////////////////
