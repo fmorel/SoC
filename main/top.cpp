@@ -24,7 +24,7 @@
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
 #include "display.h"
-//#define DO_TRACES
+#define DO_TRACES
 
 // C/C++ std libs
 #include <iostream>
@@ -303,9 +303,9 @@ int _main(int argc, char *argv[])
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
 //    sc_trace (TRACEFILE, signal_resetn, "resetn" );
 //    sc_trace (TRACEFILE, signal_clk,    "clk"    );
-    sc_trace (TRACEFILE, signal_video_clk, "video_clk");
-    sc_trace(TRACEFILE,line_valid ,"line_valid ");
-    sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
+//    sc_trace (TRACEFILE, signal_video_clk, "video_clk");
+//    sc_trace(TRACEFILE,line_valid ,"line_valid ");
+//    sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
 //    sc_trace(TRACEFILE,pixel ,"pixel ");
 //    sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
     sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
@@ -319,9 +319,9 @@ int _main(int argc, char *argv[])
 //    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
 //    sc_trace(TRACEFILE,pixel_out,"pixel_out");
         
-    sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
-    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
-    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
+//    sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
+//    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
+//    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
 #endif
 
     ////////////////////////////////////////////////////////////
