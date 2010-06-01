@@ -20,6 +20,10 @@ CFLAGS += -I$(PRINTF_DIR)
 ROOT_DIR = ..
 CFLAGS+= -I$(ROOT_DIR)
 
+MYPRINTF_DIR = ../../my_printf
+OBJS+= my_printf.o
+CPPFLAGS+= -I$(MYPRINTF_DIR)
+
 .PHONY: all clean
 
 all:$(SOFT_IMAGE)
