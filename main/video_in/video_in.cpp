@@ -146,7 +146,8 @@ namespace soclib { namespace caba {
                     // Check if enough pixels are in the buffer.
                     // Don't stop if we are finishing to send an image to memory
                     // while waiting for the next image.
-                    if(((r + 4 >= w) || (r % WIDTH == 0)) && !(w == 0)) {
+//                    if(((r + 4 >= w) || (r % WIDTH == 0)) && !(w == 0)) {
+                    if(((r + 4 >= w) || (r % MINFLUSHSIZE == 0)) && !(w == 0)) {
                         next_state = STOP_FLUSH;
                     } else if(r >= WIDTH * HEIGHT - 1) {    // End of image.
                         next_state = STOP_FLUSH_END_IMG;
@@ -293,18 +294,19 @@ namespace soclib { namespace caba {
                     }
                     break;
     
-                case STOP_FLUSH_END_IMG:
-                    interrupt = 1;
-                    r_line = 0;
-                    r_pixel = 0;
+                case STOP_FLUSH:
+                    cout << "VIDEOIN: Stop flush" << endl;
+                    interrupt = 0;
                     p_wb_master.STB_O = 0;
                     p_wb_master.CYC_O = 0;
                     p_wb_master.WE_O = 0;
                     p_wb_master.SEL_O = 0;
                     break;
 
-                case STOP_FLUSH:
-                    interrupt = 0;
+                case STOP_FLUSH_END_IMG:
+                    interrupt = 1;
+                    r_line = 0;
+                    r_pixel = 0;
                     p_wb_master.STB_O = 0;
                     p_wb_master.CYC_O = 0;
                     p_wb_master.WE_O = 0;
