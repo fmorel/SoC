@@ -15,6 +15,7 @@ ROOT_DIR = ..
 CFLAGS+= -I$(ROOT_DIR)
 
 MYPRINTF_DIR = ../../my_printf
+VPATH+=$(MYPRINTF_DIR)
 OBJS+= my_printf.o
 CPPFLAGS+= -I$(MYPRINTF_DIR)
 
