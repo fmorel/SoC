@@ -60,32 +60,34 @@ uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
 xSemaphoreHandle xSemaphore;
 portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE; 
 volatile int lock = 0;
+volatile int count = 0;
 void foo(unsigned int intrLevel, void*pContext) {
   lock = 1;
+  count ++;
   /* Unblock the task by releasing the semaphore. */
   xHigherPriorityTaskWoken = xSemaphoreGiveFromISR( xSemaphore, pdFALSE );
 
   /* If xHigherPriorityTaskWoken was set to true you
      we should yield.  The actual macro used here is 
      port specific. */
-  if( xHigherPriorityTaskWoken )  vPortYield();
+//  if( xHigherPriorityTaskWoken )  vPortYield();
 
 }
 
 void main_task(void *parameters) {
-  int i;
 
-  RegisterISR(2,NULL, &foo);
+  int i;
 
   for(i = 0;; i++) {
     portBASE_TYPE check;
-    my_printf("Trytask\n\r");
     VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-    check = xSemaphoreTake( xSemaphore, portMAX_DELAY );
-    while (!lock) {}
+    VIDEO_IN = (uint32_t)image;
+    my_printf("TrySem\n\r");
+    xSemaphoreTake( xSemaphore, portMAX_DELAY );
+    //while (!lock) {}
     lock = 0;
     VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-    my_printf("SemTaken : %d\n\r",check);
+    my_printf("SemTaken\n\r");
 
   }
 
@@ -94,6 +96,7 @@ void main_task(void *parameters) {
 int main(void) {
   xTaskHandle my_task;
   xSemaphore = xQueueCreate( ( unsigned portBASE_TYPE ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH );	
+  RegisterISR(2,NULL, &foo);
   if (xSemaphore == NULL) {
     my_printf("Semaphore creation failed.\n\r");
     return 0;

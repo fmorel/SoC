@@ -4,7 +4,7 @@ CC           = $(CC_PREFIX)gcc
 TARGET_ARCH  = -mmultiply-enabled -mbarrel-shift-enabled
 DEBUG_CFLAGS = -ggdb
 LDFLAGS      = -Tsoclib.ld
-CFLAGS       = -Wall -ggdb -O2 $(DEBUG_CFLAGS) 
+CFLAGS       = -Wall -ggdb -O0 $(DEBUG_CFLAGS) 
 CPPFLAGS     = -I. -Isrc
 
 SOFT_IMAGE = soft.elf
@@ -28,7 +28,7 @@ FREERTOS_MEMDIR = $(FREERTOS_DIR)/portable/MemMang
 
 VPATH = $(FREERTOS_DIR) $(FREERTOS_PLATDIR) $(FREERTOS_MEMDIR)
 
-FREERTOS_OBJS = queue.o list.o tasks.o Interrupts.o port.o portasm.o heap_1.o crt0bootloader.o
+FREERTOS_OBJS = queue.o list.o tasks.o Interrupts.o port.o portasm.o heap_1.o crt0ram.o
 FREERTOS_OPTS = -DLM32 -I$(FREERTOS_INCDIR) -I$(FREERTOS_PLATDIR)
 CFLAGS += $(FREERTOS_OPTS)
 OBJS   += $(FREERTOS_OBJS)
