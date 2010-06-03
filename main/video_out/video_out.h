@@ -24,7 +24,8 @@
 #define OUTPUT_IDLE 0
 #define OUTPUT_LINE 1
 #define OUTPUT_WAITLINE 2
-#define OUTPUT_WAITFRAME 3
+#define OUTPUT_WAITFRAME1 3
+#define OUTPUT_WAITFRAME2 4
 
 //synchronisation duration (in cycles)
 #define LINE_SYNC 160		
