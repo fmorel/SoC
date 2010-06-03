@@ -89,22 +89,26 @@ int main(void) {
 //    my_printf("Done\n");
 
 
-    int toto = 1;
+//    int toto = 1;
+//
+//    lock_video_in = 1;
+//    lock_video_out = 1;
+//    for (i=0; i < 10; i++) {
+//        while(!lock_video_in && !lock_video_out);
+//        if(lock_video_in) {
+//            toto = !toto;
+//            lock_video_in = 0;
+//            VIDEO_IN = toto ? (uint32_t)image : (uint32_t)image2;
+//        }
+//        if(lock_video_out) {
+//            lock_video_out = 0;
+//            VIDEO_OUT = !toto ? (uint32_t)image : (uint32_t)image2;
+//        }
+//    }
 
-    lock_video_in = 1;
-    lock_video_out = 1;
-    for (i=0; i < 10; i++) {
-        while(!lock_video_in && !lock_video_out);
-        if(lock_video_in) {
-            toto = !toto;
-            lock_video_in = 0;
-            VIDEO_IN = toto ? (uint32_t)image : (uint32_t)image2;
-        }
-        if(lock_video_out) {
-            lock_video_out = 0;
-            VIDEO_OUT = !toto ? (uint32_t)image : (uint32_t)image2;
-        }
-    }
+        VIDEO_IN = (uint32_t)image;
+        while(!lock_video_in);
+        VIDEO_OUT = (uint32_t)image;
 
 //    // Test video_in
 //    for(i = 0; i < 5; i++) {
