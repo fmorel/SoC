@@ -2,6 +2,7 @@
 *.o
 #ignore vim swap files
 .*.swp
+.*.swo
 #ignore simulation executables
 *.x
 #ignore logs
