@@ -302,13 +302,13 @@ int _main(int argc, char *argv[])
     sc_trace_file *TRACEFILE;
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
 //    sc_trace (TRACEFILE, signal_resetn, "resetn" );
-//    sc_trace (TRACEFILE, signal_clk,    "clk"    );
+    sc_trace (TRACEFILE, signal_clk,    "clk"    );
     sc_trace (TRACEFILE, signal_video_clk, "video_clk");
     sc_trace(TRACEFILE,line_valid ,"line_valid ");
     sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
-//    sc_trace(TRACEFILE,pixel ,"pixel ");
+    sc_trace(TRACEFILE,pixel ,"pixel ");
 //    sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
-//    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
+    sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
 //    sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
 //    sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
 //    sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );

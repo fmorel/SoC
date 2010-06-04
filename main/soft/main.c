@@ -95,7 +95,7 @@ int main(void) {
 
     lock_video_in = 1;
     lock_video_out = 1;
-    for (i=0; i < 10; i++) {
+    for (i=0; i < 20; i++) {
         while(!lock_video_in && !lock_video_out);
         if(lock_video_in) {
             toto_in = !toto_in;

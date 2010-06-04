@@ -8,7 +8,7 @@
 #include "utils.h"
 
 #define BUFLINES        2
-#define BUFSIZE         1280 
+#define BUFSIZE         (BUFLINES * WIDTH)
 #define MINFLUSHSIZE    4*BUS_CHUNK_SIZE
 
 

@@ -12,6 +12,7 @@
 #define VIDEO_GEN_H
 
 #include <systemc>
+#include "utils.h"      // Image dimensions included.
 
 // Une image est un tableau de pixels (unsigned char, pour une image en niveaux de gris)
 // On ne définit pas sa taille à l'avance, cela permettra de faire des 
@@ -47,11 +48,12 @@ namespace soclib { namespace caba {
                 ////////////////////////////////////////////////////
 
                 VideoGen(sc_module_name insname,
-                        const char *bn = "wallace", // nom de base par defaut
-                        const int w = 640,          // largeur d'image par defaut
-                        const int h = 480,          // hauteur par defaut
-                        const int lsync = 160,      // synchro ligne par defaut
-                        const int fsync = 40        // synchro trame par defaut
+//                        const char *bn = "wallace",         // nom de base par defaut
+                        const char *bn = "img/gfourmi",     // nom de base par defaut
+                        const int w = WIDTH,                // largeur d'image par defaut
+                        const int h = HEIGHT,               // hauteur par defaut
+                        const int lsync = LINE_SYNC,        // synchro ligne par defaut
+                        const int fsync = ENDFRAME_SYNC     // synchro trame par defaut
                         );
 
                 ////////////////////////////////////////////////////

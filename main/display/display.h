@@ -13,6 +13,7 @@
 
 #include <systemc>
 #include <SDL.h>
+#include "utils.h"      // Image dimensions included.
 
 using namespace sc_core;
 using namespace std;
@@ -39,10 +40,10 @@ namespace soclib { namespace caba {
                 ////////////////////////////////////////////////////
 
                 Display (sc_module_name insname,
-                        const int w = 640,          // largeur d'image par defaut
-                        const int h = 480,          // hauteur par defaut
-                        const int lsync = 160,      // synchro ligne par defaut
-                        const int fsync = 40        // synchro trame par defaut
+                        const int w = WIDTH,                // largeur d'image par defaut
+                        const int h = HEIGHT,               // hauteur par defaut
+                        const int lsync = LINE_SYNC,        // synchro ligne par defaut
+                        const int fsync = ENDFRAME_SYNC     // synchro trame par defaut
                         );
                 ////////////////////////////////////////////////////
                 //	destructor
