@@ -14,9 +14,8 @@
 #define ENDFRAME_SYNC   ( (HEIGHT/4 > 40) ? 40 : HEIGHT/4 )		
 #define FRAME_SYNC      (WIDTH +LINE_SYNC) * ENDFRAME_SYNC
 
-
 // Define chunk size of bus access (given in words) 
-#define BUS_CHUNK_SIZE 1
+#define BUS_CHUNK_SIZE 8
 
 // video_out constants
 #define VIDEO_OUT_BUFSIZE 2
