@@ -1,0 +1,20 @@
+Module('caba:min_incr',
+        classname = 'soclib::caba::MinIncr',
+        tmpl_parameters = [
+            parameter.Module('wb_param',  default = 'caba:wb_param'),
+        ],
+        header_files = ['min_incr.h',],
+        implementation_files = ['min_incr.cpp',],
+        ports = [
+            Port('caba:wb_slave', 'p_wb_slave'),
+						Port('caba:wb_master','p_wb_master'),
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+        ],
+        uses = [
+        Uses('caba:wishbone'),
+        Uses('caba:IncrementHard'),
+        ],
+        debug = True ,
+      )
+
