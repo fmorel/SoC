@@ -9,7 +9,7 @@
 
 #define BUFLINES        2
 #define BUFSIZE         1280 
-#define MINFLUSHSIZE    32
+#define MINFLUSHSIZE    4
 
 
 namespace soclib { namespace caba {
