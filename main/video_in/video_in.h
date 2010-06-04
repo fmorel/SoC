@@ -9,7 +9,7 @@
 
 #define BUFLINES        2
 #define BUFSIZE         1280 
-#define MINFLUSHSIZE    4
+#define MINFLUSHSIZE    4*BUS_CHUNK_SIZE
 
 
 namespace soclib { namespace caba {
@@ -37,6 +37,7 @@ namespace soclib { namespace caba {
                 sc_signal<bool>         p_video_clk_temp;
                 sc_signal<bool>         line_valid_temp;
                 sc_signal<bool>         frame_valid_temp;
+                sc_signal<bool>         ack_temp;
 
                 // Wishbone master and slave.
                 WbMaster <wb_param>     p_wb_master;
