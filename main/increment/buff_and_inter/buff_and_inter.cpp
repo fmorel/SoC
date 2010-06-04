@@ -14,7 +14,17 @@ namespace soclib {
 	    BufInter<wb_param>::BufInter(sc_core::sc_module_name insname)
 	    : sc_core::sc_module(insname),
 	    buffer("buffer"),
-	    interpolation("interpolation")
+	    //	    interpolation("interpolation"),
+	    p_clk("p_clk"),
+	    p_resetn("p_resetn"),
+	    x("x"),
+	    x_min("x_min"),
+	    y("y"),
+	    y_min("y_min"),
+	    new_tile("new_tile"),
+	    ask_for_x_y("ask_for_x_y"),
+	    intensity("intensity"),
+	    valid("valid")
 	{
 
 	    SC_METHOD(BufInterTransition);
@@ -25,20 +35,22 @@ namespace soclib {
 	    sensitive<<p_clk.neg();
 
 	    buffer.p_clk(p_clk);
-	    interpolation.p_clk(p_clk);
-	    interpolation.x(x);
-	    interpolation.y(y);
-	    buffer.buffer_command_out[2](interpolation.buffer_command[2]);
-	    interpolation.buffer_in[4](buffer.buffer_out[4]);
+	    //	    interpolation.p_clk(p_clk);
+	    //	    interpolation.x(signal_x);
+	    //	    interpolation.y(signal_y);
+	    //	    buffer.buffer_command_out[0](interpolation.buffer_command[0]);
+	    //	    buffer.buffer_command_out[1](interpolation.buffer_command[1]);
+	    //	    int i;
+	    //	    for(i = 0;i<4;i++){
+	    //	    interpolation.buffer_in[i](buffer.buffer_out[i]);
+	    //	    }
 
-	    /*DEBUG*/	    x_display(x);
-	    /*DEBUG*/	    x_min_display(x_min);
-	    /*DEBUG*/	    y_display(y);
-	    /*DEBUG*/	    y_min_display(y_min);
+	    /*DEBUG*/	    x_display(signal_x);
+	    /*DEBUG*/	    x_min_display(signal_x_min);
+	    /*DEBUG*/	    y_display(signal_y);
+	    /*DEBUG*/	    y_min_display(signal_y_min);
 	    /*DEBUG*/	    new_tile_display(new_tile);
 	    /*DEBUG*/	    ask_for_x_y_display(ask_for_x_y);
-	    /*DEBUG*/	    intensity_display(intensity);
-	    /*DEBUG*/	    valid_display(valid);
 
 	    buffer.buffer_write_enable(signal_write_enable);
 	    buffer.buffer_in(signal_buffer_in);
@@ -46,6 +58,10 @@ namespace soclib {
 
 	template <typename wb_param> \
 	    void BufInter<wb_param>::BufInterTransition() {
+		//		signal_x=x;
+		//		signal_y=y;
+		//		signal_x_min=x_min;
+		//		signal_y_min=y_min;
 		switch(state) {
 		    case LOADING : 
 			new_tile=false;

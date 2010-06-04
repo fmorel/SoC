@@ -8,7 +8,8 @@ static float a[4][4] =
      { 0,0,0,0 } } ;
 
 int sc_main(int argc,char *argv[])
-{ int X=16,Y=16;
+{ 
+    int X=16,Y=16;
 
 
 

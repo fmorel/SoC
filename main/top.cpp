@@ -79,7 +79,7 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
     maptab.add(Segment("tty"  , TTY_BASE  , TTY_SIZE  , IntTab(2), false));
     //add simple slave
-    maptab.add(Segment("increment", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), true));
+    maptab.add(Segment("increment", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), false));
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
