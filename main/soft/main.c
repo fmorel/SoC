@@ -49,23 +49,40 @@
 #define IMAGES_NUMBER 5
 
 int ante_X(int i,int j) {
-  return i/2;
+  return (i)/2;
 }
 int ante_Y(int i,int j) {
-  return j/2;
+  return (j)/2;
 }
 void vZoom(uint32_t image_address) {
   //static uint32_t image_copy[HEIGHT][WIDTH] = { { 0 } };
   //memcpy((uint32_t *)image_address, image_copy,HEIGHT*WIDTH);
   int i,j;
-  for (i = 0;i<HEIGHT;i++) {
-    for(j=0;j<WIDTH;j++) {
-     // int X = ante_X(i,j);
-     // int Y = ante_Y(i,j);
-  //    *(((uint32_t *)image_address)+j+i*WIDTH) = image_copy[i][j];
-      if (i%20 == 0)  *(((uint32_t *)image_address)+j+i*WIDTH) = 0xffffffff;
+  for (i = HEIGHT-1;i>=0;i-=2) {
+    for(j=WIDTH-1;j>=0;j--) {
+      int X = ante_X(i,j);
+      int Y = ante_Y(i,j);
+      uint32_t pixels = *(((uint32_t *)image_address)+X*WIDTH+Y);
+      uint32_t results=0;
+      uint8_t pixel1;
+      uint8_t pixel2;
+      if (j%2==0) {
+        pixel1 = pixels>>24;
+        pixel2 = pixels>>16;
+      } else {
+        pixel1 = pixels>>8;
+        pixel2 = pixels>>0;
+
+      }
+      results = (pixel1<<24) | (pixel1<<16) | (pixel2<<8) | (pixel2<<0); 
+      *(((uint32_t *)image_address)+j+i*WIDTH) = results;
+      *(((uint32_t *)image_address)+j+(i+1)*WIDTH) = results;
+      //*(((uint32_t *)image_address)+j+i*WIDTH) = image_copy[X][Y];
+   //   if (i%20 == 0)  *(((uint32_t *)image_address)+j+i*WIDTH) = 0xffffffff;
     }
   }
+  //Processing takes a long time !
+ // vTaskDelay(1000);
 }
 void vProcessImage(uint32_t image_address) {
   vZoom(image_address);
@@ -103,6 +120,7 @@ void video_in_task(void *parameters) {
       //We could not post to the queue.
       //Overwrite previous image because processing didn't get it.
       i--;
+      my_printf("Queue is FULL, dropping Frame..\n\r");
     }
   }
 }
