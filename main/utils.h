@@ -3,16 +3,26 @@
 *********************************************************/
 
 
-//size of image
-#define WIDTH 640
-#define HEIGHT 480
+// Image dimensions
+//#define WIDTH 640
+//#define HEIGHT 480
+#define WIDTH 128
+#define HEIGHT 128
 
-//video_out constants
-#define VIDEO_OUT_BUFSIZE 4
+// Sync
+#define LINE_SYNC       ( (WIDTH/4 > 160) ? 160 : WIDTH/4 )		
+#define ENDFRAME_SYNC   ( (HEIGHT/4 > 40) ? 40 : HEIGHT/4 )		
+#define FRAME_SYNC      (WIDTH +LINE_SYNC) * ENDFRAME_SYNC
 
-//video_in
+// Define chunk size of bus access (given in words) 
+#define BUS_CHUNK_SIZE 8
+
+// video_out constants
+#define VIDEO_OUT_BUFSIZE 2
+
+// video_in
 #define VIDEO_IN_BUFSIZE 4
 
-//tile size
+// tile size
 #define TILE_SIZE 16
 #define ANTE_TILE_SIZE 32

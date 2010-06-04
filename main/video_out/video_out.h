@@ -13,6 +13,7 @@
 #define MASTER_IDLE 0
 #define MASTER_BEGINLINE 1
 #define MASTER_TRANS 2
+#define MASTER_TRANSPAUSE 5
 #define MASTER_ENDOFLINE 3
 #define MASTER_ENDOFTRANS 4
 
@@ -28,8 +29,8 @@
 #define OUTPUT_WAITFRAME2 4
 
 //synchronisation duration (in cycles)
-#define LINE_SYNC 160		
-#define FRAME_SYNC (WIDTH +LINE_SYNC)*40
+//#define LINE_SYNC 160		
+//#define FRAME_SYNC (WIDTH +LINE_SYNC)*40
 
 
 //number of lines buffered

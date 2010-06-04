@@ -116,9 +116,19 @@ namespace soclib { namespace caba {
 						address+=4;
 						if(writingWord == WIDTH/4)
 							masterState=MASTER_ENDOFLINE;
+						else {
+							if (writingWord%BUS_CHUNK_SIZE==0)
+								masterState=MASTER_TRANSPAUSE;
+						}
+
+
 					}
 					break;
-				
+
+				case MASTER_TRANSPAUSE:
+					masterState=MASTER_TRANS;
+					break;
+
 				//relase the wishbone bus and start another line or finalize transmission
 				case MASTER_ENDOFLINE:
 					writingLine++;
@@ -150,9 +160,16 @@ namespace soclib { namespace caba {
 					p_wb_master.WE_O=0;
 					p_wb_master.ADR_O=address;
 					break;
+
+				case MASTER_TRANSPAUSE:
+					p_wb_master.STB_O=0;
+					p_wb_master.CYC_O=0;
+					break;
+
 				case MASTER_ENDOFLINE:
 					p_wb_master.STB_O=0;
 					p_wb_master.CYC_O=0;
+					break;
 				default:
 					p_wb_master.STB_O=0;
 					p_wb_master.CYC_O=0;
