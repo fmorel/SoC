@@ -10,8 +10,8 @@
 #define HEIGHT 128
 
 // Sync
-#define LINE_SYNC       ( (WIDTH/4 > 160) ? 160 : WIDTH/4 )		
-#define ENDFRAME_SYNC   ( (HEIGHT/4 > 40) ? 40 : HEIGHT/4 )		
+#define LINE_SYNC       ((int)((25000000/60-640*480)/480))
+#define ENDFRAME_SYNC   40
 #define FRAME_SYNC      (WIDTH +LINE_SYNC) * ENDFRAME_SYNC
 
 // Define chunk size of bus access (given in words) 
