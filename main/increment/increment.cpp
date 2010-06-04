@@ -47,22 +47,27 @@ namespace soclib { namespace caba {
 	    buff_and_inter.y_min	(signal_y_min);
 	    buff_and_inter.new_tile	(signal_new_tile);
 	    buff_and_inter.ask_for_x_y	(signal_ask);
+	    buff_and_inter.intensity	(signal_intensity);
+	    buff_and_inter.valid	(signal_valid);
 
-	    /*DEBUG*/	buff_and_inter.x_display(x_display);
-	    /*DEBUG*/	buff_and_inter.x_min_display(x_min_display);
-	    /*DEBUG*/	buff_and_inter.y_display(y_display);
-	    /*DEBUG*/	buff_and_inter.y_min_display(y_min_display);
-	    /*DEBUG*/	buff_and_inter.intensity(intensity_display);
-	    /*DEBUG*/	buff_and_inter.valid(valid_display);
-
-
+	  
 	    buff_and_inter.p_wb_master	(p_wb_master);
 	}
 
     template <typename wb_param> \
 	void Increment<wb_param>::incrementTransition() {
-	    new_tile_display=signal_new_tile;
-	    ask_for_x_y_display=signal_ask;
+	    //new_tile_display=signal_new_tile;
+	    //ask_for_x_y_display=signal_ask;
+      /*DEBUG*/	x_display = signal_x;
+	    /*DEBUG*/	x_min_display = signal_x_min;
+	    /*DEBUG*/	y_display = signal_y;
+	    /*DEBUG*/	y_min_display = signal_y_min;
+	    /*DEBUG*/	ask_for_x_y_display = signal_ask;
+	    /*DEBUG*/	new_tile_display = signal_new_tile;
+	    /*DEBUG*/	intensity_display	 = signal_intensity;
+	    /*DEBUG*/	valid_display	 = signal_valid;
+
+
 	}
 
     template <typename wb_param> \

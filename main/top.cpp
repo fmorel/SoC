@@ -24,7 +24,7 @@
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
 //#include "display.h"
-//#define DO_TRACES 1
+#define DO_TRACES
 
 // C/C++ std libs
 #include <iostream>
@@ -301,14 +301,14 @@ int _main(int argc, char *argv[])
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
     //sc_trace (TRACEFILE, signal_resetn, "resetn" );
     sc_trace (TRACEFILE, signal_clk,    "clk"    );
-    sc_trave (TRACEFILE, signal_x_display ,"x");
-    sc_trave (TRACEFILE, signal_x_min_display ,"x_min");
-    sc_trave (TRACEFILE, signal_y_display ,"y");
-    sc_trave (TRACEFILE, signal_y_min_display ,"y_min");
-    sc_trave (TRACEFILE, signal_new_tile_display ,"new_tile");
-    sc_trave (TRACEFILE, signal_ask_for_x_y_display ,"ask_for_x_y");
-    sc_trave (TRACEFILE, signal_intensity_display ,"intensity");
-    sc_trave (TRACEFILE, signal_valid_display ,"valid");
+    sc_trace (TRACEFILE, signal_x_display ,"x");
+    sc_trace (TRACEFILE, signal_x_min_display ,"x_min");
+    sc_trace (TRACEFILE, signal_y_display ,"y");
+    sc_trace (TRACEFILE, signal_y_min_display ,"y_min");
+    sc_trace (TRACEFILE, signal_new_tile_display ,"new_tile");
+    sc_trace (TRACEFILE, signal_ask_for_x_y_display ,"ask_for_x_y");
+    sc_trace (TRACEFILE, signal_intensity_display ,"intensity");
+    sc_trace (TRACEFILE, signal_valid_display ,"valid");
 
 #endif
 

@@ -6,7 +6,7 @@
 #include "wb_slave.h"
 #include"wb_master.h"
 #include "../buffer/buffer.h"
-//#include "../interpolation/interpolation.h"
+#include "../interpolation/interpolation.h"
 #include "../../segmentation.h"
 
 namespace soclib { namespace caba {
@@ -16,7 +16,7 @@ namespace soclib { namespace caba {
 	class BufInter: public sc_core::sc_module{
 	    private:
 		soclib::caba::Buffer buffer;
-		//   soclib::caba::Interpolation interpolation;
+		   soclib::caba::Interpolation interpolation;
 		enum BufInterStates {
 		    UNDEFINED,
 		    IDLE,
@@ -27,6 +27,9 @@ namespace soclib { namespace caba {
 		sc_signal<uint32_t> signal_buffer_in;
 		sc_signal<float> signal_x_min;
 		sc_signal<float> signal_y_min;
+    sc_signal<int>   signal_buffer_command[2];
+    sc_signal<unsigned char>   signal_buffer_out[4];
+    sc_signal<unsigned char>  signal_intensity;
 		int state;
 		int next_state;
 	    protected:
@@ -45,13 +48,6 @@ namespace soclib { namespace caba {
 		sc_core::sc_out<bool>   ask_for_x_y;
 		sc_core::sc_out<char>   intensity;
 		sc_core::sc_out<bool>   valid;
-
-		/*DEBUG*/	    sc_core::sc_out<float>   x_display;
-		/*DEBUG*/	    sc_core::sc_out<float>   x_min_display;
-		/*DEBUG*/	    sc_core::sc_out<float>   y_display;
-		/*DEBUG*/	    sc_core::sc_out<float>   y_min_display;
-		/*DEBUG*/	    sc_core::sc_out<bool>   new_tile_display;
-		/*DEBUG*/	    sc_core::sc_out<bool>   ask_for_x_y_display;
 
 		//wishbone interface
 		WbMaster <wb_param>		p_wb_master;

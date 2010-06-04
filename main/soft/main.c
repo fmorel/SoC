@@ -86,7 +86,7 @@ int main(void) {
     float S0 = 2* a[2][1] ;
     float S1 = P1;
 
-    for(i=0;i<5;i++) {
+    for(i=0;i<4;i++) {
 	*((volatile unsigned int*) 0xB0000000) = P0;
 	*((volatile unsigned int*) 0xB0000000) = P1;
 	*((volatile unsigned int*) 0xB0000000) = P2;

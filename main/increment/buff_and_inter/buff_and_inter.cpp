@@ -14,7 +14,7 @@ namespace soclib {
 	    BufInter<wb_param>::BufInter(sc_core::sc_module_name insname)
 	    : sc_core::sc_module(insname),
 	    buffer("buffer"),
-	    //	    interpolation("interpolation"),
+      interpolation("interpolation"),
 	    p_clk("p_clk"),
 	    p_resetn("p_resetn"),
 	    x("x"),
@@ -31,26 +31,26 @@ namespace soclib {
 	    dont_initialize();
 	    sensitive<<p_clk.pos();
 	    SC_METHOD(BufInterMoore);
-	    dont_initialize();
-	    sensitive<<p_clk.neg();
+      dont_initialize();
+      sensitive<<p_clk.neg();
 
-	    buffer.p_clk(p_clk);
-	    //	    interpolation.p_clk(p_clk);
-	    //	    interpolation.x(signal_x);
-	    //	    interpolation.y(signal_y);
-	    //	    buffer.buffer_command_out[0](interpolation.buffer_command[0]);
-	    //	    buffer.buffer_command_out[1](interpolation.buffer_command[1]);
-	    //	    int i;
-	    //	    for(i = 0;i<4;i++){
-	    //	    interpolation.buffer_in[i](buffer.buffer_out[i]);
-	    //	    }
+      buffer.p_clk(p_clk);
+      buffer.p_resetn(p_resetn);
+      interpolation.p_clk(p_clk);
+      interpolation.p_resetn(p_resetn);
+      interpolation.x(signal_x);
+      interpolation.y(signal_y);
+      interpolation.out(signal_intensity);
+      int i;
+      for(i = 0;i<2;i++){
+        buffer.buffer_command_out[i](signal_buffer_command[i]);
+        interpolation.buffer_command[i](signal_buffer_command[i]);
+      }
+      for(i = 0;i<4;i++){
+        interpolation.buffer_in[i](signal_buffer_out[i]);
+        buffer.buffer_out[i](signal_buffer_out[i]);
+      }
 
-	    /*DEBUG*/	    x_display(signal_x);
-	    /*DEBUG*/	    x_min_display(signal_x_min);
-	    /*DEBUG*/	    y_display(signal_y);
-	    /*DEBUG*/	    y_min_display(signal_y_min);
-	    /*DEBUG*/	    new_tile_display(new_tile);
-	    /*DEBUG*/	    ask_for_x_y_display(ask_for_x_y);
 
 	    buffer.buffer_write_enable(signal_write_enable);
 	    buffer.buffer_in(signal_buffer_in);
@@ -101,7 +101,8 @@ namespace soclib {
 		    next_state=INTERPOLING;
 		if(state==INTERPOLING && interpoled)
 		    next_state=LOADING;
-	    }
+    intensity = signal_intensity;
+      }
     }
 }
 

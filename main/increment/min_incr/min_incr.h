@@ -26,36 +26,48 @@ namespace soclib { namespace caba {
 	    sc_signal<float> signal_x_y_min[20]; 
 	    sc_signal<float> signal_x_y[20]; 
 
-	    enum MinIncrStates {
-		UNDEFINED,
-		WAIT_CONFIG,
-		IDLE,
-		INIT_INCR_MIN,
-		INIT_INCR,
-		NEW_TILE_REQUEST
-	    };
+      sc_core::sc_signal<float> signal_x_tmp;
+      sc_core::sc_signal<float> signal_y_tmp;
+      sc_core::sc_signal<float> signal_x_min_tmp;
+      sc_core::sc_signal<float> signal_y_min_tmp;
+      float x_min_internal,y_min_internal;
 
-	    int state;
-	protected:
-	    SC_HAS_PROCESS(MinIncr);
+      int poly_index;
+      bool good_to_send;
+      int last_init_poly;
+      int next_state;
+      int init_latency;
+      bool next_tile_happened;
+      int i;
 
-	public:    
-	    sc_core::sc_in<bool>    p_clk;
-	    sc_core::sc_in<bool>    p_resetn;
-	    sc_core::sc_out<float>  x_min;
-	    sc_core::sc_out<float>  y_min;
-	    sc_core::sc_out<float>  x;
-	    sc_core::sc_out<float>  y;
-	    sc_core::sc_in<bool>    new_tile;
-	    sc_core::sc_in<bool>    ask_for_x_y;
+      enum MinIncrStates {
+        WAIT_CONFIG,
+        INIT_INCR_MIN,
+        INIT_INCR,
+        NEW_TILE_REQUEST
+      };
 
-	    //wishbone interface
-	    WbSlave <wb_param>		  p_wb_slave;
-	    // constructor
-	    MinIncr (sc_core::sc_module_name insname);
-	    void MinIncrComputeMin();
-	    void MinIncrTransition();
-	    void MinIncrMoore();
+      int state;
+  protected:
+      SC_HAS_PROCESS(MinIncr);
+
+  public:    
+      sc_core::sc_in<bool>    p_clk;
+      sc_core::sc_in<bool>    p_resetn;
+      sc_core::sc_out<float>  x_min;
+      sc_core::sc_out<float>  y_min;
+      sc_core::sc_out<float>  x;
+      sc_core::sc_out<float>  y;
+      sc_core::sc_in<bool>    new_tile;
+      sc_core::sc_in<bool>    ask_for_x_y;
+
+      //wishbone interface
+      WbSlave <wb_param>		  p_wb_slave;
+      // constructor
+      MinIncr (sc_core::sc_module_name insname);
+      void MinIncrComputeMin();
+      void MinIncrTransition();
+      void MinIncrMoore();
     };
 }}
 #endif

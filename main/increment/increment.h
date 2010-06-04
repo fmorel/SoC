@@ -26,6 +26,7 @@ namespace soclib { namespace caba {
 		sc_signal<float> signal_x_min;
 		sc_signal<float> signal_y;
 		sc_signal<float> signal_y_min;
+
 	    protected:
 		SC_HAS_PROCESS(Increment);
 	    public:
