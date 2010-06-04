@@ -7,11 +7,11 @@
 #define WIDTH 640
 #define HEIGHT 480
 
-//define chunk size of bus access 
+//define chunk size of bus access (given in words) 
 #define BUS_CHUNK_SIZE 8
 
 //video_out constants
-#define VIDEO_OUT_BUFSIZE 4
+#define VIDEO_OUT_BUFSIZE 2
 
 //video_in
 #define VIDEO_IN_BUFSIZE 4
