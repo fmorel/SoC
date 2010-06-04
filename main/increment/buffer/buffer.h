@@ -3,7 +3,7 @@
 
 #include <systemc>
 #include <stdint.h>
-#include "utils.h"
+#include "../../utils.h"
 
 namespace soclib { namespace caba {
 

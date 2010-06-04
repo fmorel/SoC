@@ -1,4 +1,4 @@
-Module('caba:increment_hard',
+Module('caba:IncrementHard',
         classname = 'soclib::caba::IncrementHard',
         header_files = ['increment_hard.h',],
         implementation_files = ['increment_hard.cpp',],

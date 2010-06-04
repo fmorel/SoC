@@ -8,7 +8,6 @@
 #include "../buffer/buffer.h"
 #include "../interpolation/interpolation.h"
 #include "../../segmentation.h"
-#include "../increment_hard/increment_hard.h"
 
 namespace soclib { namespace caba {
 
@@ -24,7 +23,8 @@ namespace soclib { namespace caba {
 		LOADING,
 		INTERPOLING
 	    };
-
+	    sc_signal<bool> signal_write_enable;
+	    sc_signal<uint32_t> signal_buffer_in;
 	    int state;
 	    int next_state;
 	protected:
@@ -33,14 +33,24 @@ namespace soclib { namespace caba {
 	public:    
 	    sc_core::sc_in<bool>    p_clk;
 	    sc_core::sc_in<bool>    p_resetn;
-	    sc_core::sc_in<float>   x;
-	    sc_core::sc_in<float>   x_min;
-	    sc_core::sc_in<float>   y;
-	    sc_core::sc_in<float>   y_min;
+	    sc_core::sc_inout<float>   x;
+	    sc_core::sc_inout<float>   x_min;
+	    sc_core::sc_inout<float>   y;
+	    sc_core::sc_inout<float>   y_min;
 	    sc_core::sc_out<bool>   new_tile;
 	    sc_core::sc_out<bool>   ask_for_x_y;
 	    sc_core::sc_out<char>   intensity;
 	    sc_core::sc_out<bool>   valid;
+
+	    /*DEBUG*/	    sc_core::sc_out<float>   x_display;
+	    /*DEBUG*/	    sc_core::sc_out<float>   x_min_display;
+	    /*DEBUG*/	    sc_core::sc_out<float>   y_display;
+	    /*DEBUG*/	    sc_core::sc_out<float>   y_min_display;
+	    /*DEBUG*/	    sc_core::sc_out<bool>   new_tile_display;
+	    /*DEBUG*/	    sc_core::sc_out<bool>   ask_for_x_y_display;
+	    /*DEBUG*/	    sc_core::sc_out<char>   intensity_display;
+	    /*DEBUG*/	    sc_core::sc_out<bool>   valid_display;
+
 	    //wishbone interface
 	    WbMaster <wb_param>		p_wb_master;
 	    // constructor

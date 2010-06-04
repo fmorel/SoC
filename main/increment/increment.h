@@ -6,38 +6,44 @@
 #include "wb_slave.h"
 #include <stdint.h>
 
-#include "segmentation.h"
-#include "increment_hard.h"
-#include "interpolation.h"
-#include "increment_wb.h"
-#include "buffer.h"
+#include "../segmentation.h"
+#include "./min_incr/min_incr.h"
+#include "./buff_and_inter/buff_and_inter.h"
 
 namespace soclib { namespace caba {
 
     template <typename wb_param>
 
         class Increment: public sc_core::sc_module{
-            private:
-                soclib::caba::IncrementHard incrementHard;
-                soclib::caba::Interpolation interpolation;
-                soclib::caba::Buffer buffer;
-                soclib::caba::WbArbiter wb_arbiter;
-                sc_core::sc_in<bool>              dummy;
-                sc_core::sc_in<float>             dummy1;
-						protected:
-                SC_HAS_PROCESS(Increment);
-            public:
-                sc_core::sc_in<bool>              p_clk;
-                sc_core::sc_in<bool>              p_resetn;
+	    private:
+		soclib::caba::MinIncr <wb_param>    min_incr;
+		soclib::caba::BufInter <wb_param>   buff_and_inter;
+		sc_core::sc_in<bool>		    dummy;
+		sc_core::sc_in<float>		    dummy1;
+	    protected:
+		SC_HAS_PROCESS(Increment);
+	    public:
+		sc_core::sc_in<bool>              p_clk;
+		sc_core::sc_in<bool>              p_resetn;
+
+		/*DEBUG*/	    sc_core::sc_inout<float>	x_display;
+		/*DEBUG*/	    sc_core::sc_inout<float>	x_min_display;
+		/*DEBUG*/	    sc_core::sc_inout<float>	y_display;
+		/*DEBUG*/	    sc_core::sc_inout<float>	y_min_display;
+		/*DEBUG*/	    sc_core::sc_inout<bool>	new_tile_display;
+		/*DEBUG*/	    sc_core::sc_inout<bool>	ask_for_x_y_display;
+		/*DEBUG*/	    sc_core::sc_inout<char>	intensity_display;
+		/*DEBUG*/	    sc_core::sc_inout<bool>	valid_display;
+
 		//wishbone interface
 		WbMaster <wb_param>		  p_wb_master;
 		WbSlave <wb_param>		  p_wb_slave;
-                // constructor
-                Increment (sc_core::sc_module_name insname);
+		// constructor
+		Increment (sc_core::sc_module_name insname);
 
-								void incrementTransition();
-								void incrementMoore();
-        };
+		void incrementTransition();
+		void incrementMoore();
+	};
 
 }}
 #endif

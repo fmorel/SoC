@@ -13,10 +13,8 @@ Module('caba:increment',
         ],
         uses = [
         Uses('caba:wishbone'),
-        Uses('caba:increment_hard'),
-        Uses('caba:increment_wb'),
-        Uses('caba:interpolation'),
-        Uses('caba:buffer'),
+        Uses('caba:min_incr'),
+        Uses('caba:buff_and_inter'),
         ],
         debug = True ,
       )
