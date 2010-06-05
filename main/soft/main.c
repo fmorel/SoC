@@ -34,6 +34,7 @@
 #include "semphr.h"
 #include "segmentation.h"
 #include "my_printf.h"
+#include "utils.h"
 
 //memcpy
 #include <string.h>
@@ -41,31 +42,28 @@
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
 
-//in word (4 bytes)
-#define WIDTH 160
-#define HEIGHT 480
-#define MODULO 16
 
 #define IMAGES_NUMBER 5
 
-typedef uint32_t image_t[HEIGHT][WIDTH] ;
+#define REAL_WIDTH WIDTH/4
+typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
 int ante_X(int i,int j) {
-  return (i+HEIGHT/2)/2;
+  return i/2 + HEIGHT / 4;
 }
 int ante_Y(int i,int j) {
-  return (j+WIDTH/2)/2;
+  return j/2 + REAL_WIDTH / 4;
 }
 void vZoom(image_t image) {
   static image_t image_copy; 
   int i,j;
   for (i=0;i<HEIGHT;i++) {
-    for (j=0;j<WIDTH;j++) {
+    for (j=0;j<REAL_WIDTH;j++) {
       image_copy[i][j] = image[i][j];
     }
   }
   for (i = HEIGHT-1;i>=1;i-=2) {
-    for(j=WIDTH-1;j>=0;j--) {
+    for(j=REAL_WIDTH-1;j>=0;j--) {
       int X = ante_X(i,j);
       int Y = ante_Y(i,j);
       uint32_t pixels = image_copy[X][Y]; 
