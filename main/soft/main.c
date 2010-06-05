@@ -51,20 +51,24 @@
 typedef uint32_t image_t[HEIGHT][WIDTH] ;
 
 int ante_X(int i,int j) {
-  return (i)/2;
+  return (i+HEIGHT/2)/2;
 }
 int ante_Y(int i,int j) {
-  return (j)/2;
+  return (j+WIDTH/2)/2;
 }
 void vZoom(image_t image) {
-  //static uint32_t image_copy[HEIGHT][WIDTH] = { { 0 } };
-  //memcpy((uint32_t *)image_address, image_copy,HEIGHT*WIDTH);
+  static image_t image_copy; 
   int i,j;
+  for (i=0;i<HEIGHT;i++) {
+    for (j=0;j<WIDTH;j++) {
+      image_copy[i][j] = image[i][j];
+    }
+  }
   for (i = HEIGHT-1;i>=1;i-=2) {
     for(j=WIDTH-1;j>=0;j--) {
       int X = ante_X(i,j);
       int Y = ante_Y(i,j);
-      uint32_t pixels = image[X][Y]; 
+      uint32_t pixels = image_copy[X][Y]; 
       uint32_t results=0;
       uint8_t pixel1;
       uint8_t pixel2;
@@ -172,7 +176,7 @@ int main(void) {
   }
 
   xTaskCreate(&video_in_task        , (const signed char*)"video_in task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+2,NULL);
-  xTaskCreate(&video_out_task       , (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+2,NULL);
+  xTaskCreate(&video_out_task       , (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+3,NULL);
   xTaskCreate(&video_processing_task, (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,NULL);
   vTaskStartScheduler();
   return 0;
