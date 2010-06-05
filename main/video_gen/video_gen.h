@@ -48,8 +48,8 @@ namespace soclib { namespace caba {
                 ////////////////////////////////////////////////////
 
                 VideoGen(sc_module_name insname,
-                        const char *bn = "wallace",         // nom de base par defaut
-//                        const char *bn = "img/gfourmi",     // nom de base par defaut
+//                        const char *bn = "wallace",         // nom de base par defaut
+                        const char *bn = "img/gfourmi",     // nom de base par defaut
                         const int w = WIDTH,                // largeur d'image par defaut
                         const int h = HEIGHT,               // hauteur par defaut
                         const int lsync = LINE_SYNC,        // synchro ligne par defaut
