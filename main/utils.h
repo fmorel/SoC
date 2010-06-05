@@ -4,10 +4,10 @@
 
 
 // Image dimensions
-//#define WIDTH 640
-//#define HEIGHT 480
-#define WIDTH 128
-#define HEIGHT 128
+#define WIDTH 640
+#define HEIGHT 480
+//#define WIDTH 128
+//#define HEIGHT 128
 
 // Sync
 #define LINE_SYNC       ((int)((25000000/60-HEIGHT*WIDTH)/HEIGHT))
