@@ -49,16 +49,16 @@
 #define IMAGES_NUMBER 5
 
 int ante_X(int i,int j) {
-  return (i)/2;
+  return i/2;
 }
 int ante_Y(int i,int j) {
-  return (j)/2;
+  return j/2;
 }
 void vZoom(uint32_t image_address) {
   //static uint32_t image_copy[HEIGHT][WIDTH] = { { 0 } };
   //memcpy((uint32_t *)image_address, image_copy,HEIGHT*WIDTH);
   int i,j;
-  for (i = HEIGHT-1;i>=0;i-=2) {
+  for (i = HEIGHT-1;i>=1;i-=2) {
     for(j=WIDTH-1;j>=0;j--) {
       int X = ante_X(i,j);
       int Y = ante_Y(i,j);
@@ -76,7 +76,7 @@ void vZoom(uint32_t image_address) {
       }
       results = (pixel1<<24) | (pixel1<<16) | (pixel2<<8) | (pixel2<<0); 
       *(((uint32_t *)image_address)+j+i*WIDTH) = results;
-      *(((uint32_t *)image_address)+j+(i+1)*WIDTH) = results;
+      *(((uint32_t *)image_address)+j+(i-1)*WIDTH) = results;
       //*(((uint32_t *)image_address)+j+i*WIDTH) = image_copy[X][Y];
    //   if (i%20 == 0)  *(((uint32_t *)image_address)+j+i*WIDTH) = 0xffffffff;
     }
