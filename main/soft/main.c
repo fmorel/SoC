@@ -171,8 +171,8 @@ int main(void) {
     return 0;
   }
 
-  xTaskCreate(&video_in_task        , (const signed char*)"video_in task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,NULL);
-  xTaskCreate(&video_out_task       , (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,NULL);
+  xTaskCreate(&video_in_task        , (const signed char*)"video_in task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+2,NULL);
+  xTaskCreate(&video_out_task       , (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+2,NULL);
   xTaskCreate(&video_processing_task, (const signed char*)"video_out task", configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY+1,NULL);
   vTaskStartScheduler();
   return 0;
