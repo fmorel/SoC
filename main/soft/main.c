@@ -48,13 +48,15 @@
 
 #define IMAGES_NUMBER 5
 
+typedef uint32_t image_t[HEIGHT][WIDTH] ;
+
 int ante_X(int i,int j) {
-  return i/2;
+  return (i)/2;
 }
 int ante_Y(int i,int j) {
-  return j/2;
+  return (j)/2;
 }
-void vZoom(uint32_t image_address) {
+void vZoom(image_t image) {
   //static uint32_t image_copy[HEIGHT][WIDTH] = { { 0 } };
   //memcpy((uint32_t *)image_address, image_copy,HEIGHT*WIDTH);
   int i,j;
@@ -62,7 +64,7 @@ void vZoom(uint32_t image_address) {
     for(j=WIDTH-1;j>=0;j--) {
       int X = ante_X(i,j);
       int Y = ante_Y(i,j);
-      uint32_t pixels = *(((uint32_t *)image_address)+X*WIDTH+Y);
+      uint32_t pixels = image[X][Y]; 
       uint32_t results=0;
       uint8_t pixel1;
       uint8_t pixel2;
@@ -75,17 +77,15 @@ void vZoom(uint32_t image_address) {
 
       }
       results = (pixel1<<24) | (pixel1<<16) | (pixel2<<8) | (pixel2<<0); 
-      *(((uint32_t *)image_address)+j+i*WIDTH) = results;
-      *(((uint32_t *)image_address)+j+(i-1)*WIDTH) = results;
-      //*(((uint32_t *)image_address)+j+i*WIDTH) = image_copy[X][Y];
-   //   if (i%20 == 0)  *(((uint32_t *)image_address)+j+i*WIDTH) = 0xffffffff;
+      image[i-1][j] = results;
+      image[i][j] = results;
     }
   }
   //Processing takes a long time !
  // vTaskDelay(1000);
 }
-void vProcessImage(uint32_t image_address) {
-  vZoom(image_address);
+void vProcessImage(image_t image) {
+  vZoom(image);
 }
 
 
@@ -104,19 +104,19 @@ void video_in_handler() {
 }
 void video_in_task(void *parameters) {
   int i;
-  static uint32_t images[IMAGES_NUMBER][HEIGHT][WIDTH] = { { { 0 } } };
+  static image_t images[IMAGES_NUMBER] = { { { 0 } } };
 
   for (i=0;;i++) {
-    uint32_t current_image = (uint32_t)images[i%IMAGES_NUMBER] ;
+    image_t *current_image = &images[i%IMAGES_NUMBER] ;
     //Give video_in an address.
-    VIDEO_IN  = current_image;
+    VIDEO_IN  = (uint32_t)current_image;
     //Wait for video_in to complete transfer
     xSemaphoreTake( xSemaphore_video_in, portMAX_DELAY );
 
 
     //Post the new valid image to the queue.
     //Drop it if the queue is full
-    if (pdFALSE == xQueueSend(xQueue_valid_images_address,&current_image, 0 )) {
+    if (pdTRUE != xQueueSend(xQueue_valid_images_address,&current_image, 0 )) {
       //We could not post to the queue.
       //Overwrite previous image because processing didn't get it.
       i--;
@@ -125,27 +125,27 @@ void video_in_task(void *parameters) {
   }
 }
 void video_processing_task(void *parameters) {
-  uint32_t image_address;
+  image_t *image_address;
   for(;;) {
     xQueueReceive(xQueue_valid_images_address,&image_address, portMAX_DELAY);
-    vProcessImage(image_address);
+    vProcessImage(*image_address);
     xQueueSend(xQueue_processed_images_address,&image_address,0);
   } 
 }
 void video_out_task(void *parameters) {
-  static uint32_t dummy_image[HEIGHT][WIDTH] = { { 0 } };
-  uint32_t image_address=(uint32_t)dummy_image;
-  uint32_t previous_image_address;
+  static image_t dummy_image = { { 0 } };
+  image_t* image_address = &dummy_image;
+  image_t* previous_image_address;
   for(;;) {
 
     //Get the image address from the queue. Do not wait.
     previous_image_address = image_address;
-    if (pdFALSE == xQueueReceive(xQueue_processed_images_address,&image_address, 0)) {
+    if (pdTRUE != xQueueReceive(xQueue_processed_images_address,&image_address, 0)) {
       //We didn't get a new image. Use the previous one.
       image_address = previous_image_address;
     } 
     //Tell video_out
-    VIDEO_OUT = image_address;
+    VIDEO_OUT = (uint32_t)image_address;
 
     //Wait for Video_out to ask for an image.
     xSemaphoreTake( xSemaphore_video_out, portMAX_DELAY );
