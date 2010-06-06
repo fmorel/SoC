@@ -8,10 +8,10 @@
 
 
 // Image dimensions
-//#define WIDTH 640
-//#define HEIGHT 480
-#define WIDTH 128
-#define HEIGHT 128
+#define WIDTH 640
+#define HEIGHT 480
+//#define WIDTH 128
+//#define HEIGHT 128
 #define REAL_WIDTH WIDTH/4
 typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
