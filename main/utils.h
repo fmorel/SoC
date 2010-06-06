@@ -16,7 +16,7 @@
 typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
 // Sync
-#define LINE_SYNC       ((int)((25000000/60-HEIGHT*WIDTH)/HEIGHT))
+#define LINE_SYNC       ((int)((25000000/(60*(HEIGHT+40)))-WIDTH))
 #define ENDFRAME_SYNC   40
 #define FRAME_SYNC      (WIDTH +LINE_SYNC) * ENDFRAME_SYNC
 
