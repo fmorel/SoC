@@ -28,101 +28,67 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "utils.h"
+#include "process.h"
 #include "lm32_irq.h"
 #include "segmentation.h"
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
 
-//in word (4 bytes)
-#define WIDTH 160
-#define HEIGHT 480
-#define MODULO 16
+#define IMAGES_NUMBER 8
 
-uint32_t image[HEIGHT][WIDTH] = { { 0 } };
-uint32_t image2[HEIGHT][WIDTH] = { { 0 } };
-volatile int img_n = 0;
-volatile int lock_video_in = 0;
-volatile int lock_video_out = 0;
+volatile unsigned int video_in_index;
+volatile unsigned int processing_index;
+volatile int difference;
+volatile uint32_t last_processed_image;
+image_t images[IMAGES_NUMBER] = { { { 0 } } };
 
-int damier(int i, int j) {
-	i = i % MODULO;
-	j *= 4;
-	j = j % MODULO;
-	if (i<MODULO/2 && j<MODULO/2) return 0xffffffff;
-	if (i>= MODULO/2 && j< MODULO/2) return 0;
-	if (i< MODULO/2 && j>= MODULO/2) return 0;
-	return 0xffffffff;
+void video_in_handler() {
+  //Give video_in an address.
+  VIDEO_IN  = (uint32_t)&images[(video_in_index)%IMAGES_NUMBER] ;
+  if ((video_in_index - processing_index) <2) {
+    video_in_index++;
+  }
 }
 
 void video_out_handler() {
-    lock_video_out = 1;
-    my_printf("VIDEO_OUT: interrupt\n\r");
+  //Tell video_out
+  VIDEO_OUT = last_processed_image;
 }
 
-void video_in_handler() {
-//    my_printf("VIDEO_IN: interrupt\n\r");
-		lock_video_in = 1;
+
+void video_processing_task() {
+  for(;;) {
+    while((video_in_index - processing_index ) < 2);
+
+    uint32_t image_address = (uint32_t)&images[processing_index];
+    my_printf("Processing image : %x\n\r",image_address);
+    vProcessImage(*((image_t *)image_address));
+    my_printf("Processed image : %x\n\r",image_address);
+    processing_index++;
+    last_processed_image = image_address;
+  }
 }
 
 int main(void) {
 
-    irq_enable();
+  irq_enable();
 
-    RegisterIrqEntry(1, &video_out_handler);
-    RegisterIrqEntry(2, &video_in_handler);
+  RegisterIrqEntry(1, &video_out_handler);
+  RegisterIrqEntry(2, &video_in_handler);
 
-    int i,j;
+  processing_index = 0;
+  video_in_index = 1;
+  last_processed_image = (uint32_t)&images[IMAGES_NUMBER-1];
 
-//	for (i=0;i<HEIGHT;i++) {
-//		for (j=0;j<WIDTH/4;j++) {
-//			image[i][j]=damier(i,j);
-//		}
-//	}
-	
-//    lock_video_out = 1;
-//    for(i = 0; i < 5; i++) {
-//        while(!lock_video_out);
-//        my_printf("Sending %i\n\r", i);
-//        lock_video_out = 0;
-//        VIDEO_OUT = (uint32_t)image;
-//    }
-//    my_printf("Done\n");
+  //Initialize VIDEO_IN
+  VIDEO_IN  = (uint32_t)&images[0] ;
+  //Initialize VIDEO_OUT
+  VIDEO_OUT = last_processed_image ;
+  video_processing_task();
 
-
-    int toto_in = 1;
-		int toto_out= 0;
-
-    lock_video_in = 1;
-    lock_video_out = 1;
-    for (i=0; i < 20; i++) {
-        while(!lock_video_in && !lock_video_out);
-        if(lock_video_in) {
-            toto_in = !toto_in;
-            lock_video_in = 0;
-            VIDEO_IN = toto_in ? (uint32_t)image : (uint32_t)image2;
-        }
-        if(lock_video_out) {
-						toto_out =!toto_out;
-            lock_video_out = 0;
-            VIDEO_OUT = toto_out ? (uint32_t)image : (uint32_t)image2;
-        }
-    }
-
-//        VIDEO_IN = (uint32_t)image;
-//        while(!lock_video_in);
-//        VIDEO_OUT = (uint32_t)image;
-
-//    // Test video_in
-//    for(i = 0; i < 5; i++) {
-//        VIDEO_IN = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-//        while(!lock_video_out);
-//        VIDEO_OUT = (i % 2) == 0 ? (uint32_t)image : (uint32_t)image2;
-//        lock = 0;
-//
-//    }
-
-    getchar();
-    return 0;
+  getchar();
+  return 0;
 }
 

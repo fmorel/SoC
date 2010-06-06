@@ -1,3 +1,7 @@
+#ifndef UTILS_H
+#define UTILS_H
+
+#include <stdint.h>
 /*********************************************************
 ******  Definition of all the important parameters *******
 *********************************************************/
@@ -8,6 +12,8 @@
 //#define HEIGHT 480
 #define WIDTH 128
 #define HEIGHT 128
+#define REAL_WIDTH WIDTH/4
+typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
 // Sync
 #define LINE_SYNC       ((int)((25000000/60-HEIGHT*WIDTH)/HEIGHT))
@@ -26,3 +32,5 @@
 // tile size
 #define TILE_SIZE 16
 #define ANTE_TILE_SIZE 32
+
+#endif

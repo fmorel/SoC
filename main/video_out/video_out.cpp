@@ -60,8 +60,10 @@ namespace soclib { namespace caba {
 				//acknowledge the request and echo the address
 				case SLAVE_REQ:
 					p_wb_slave.ACK_O=1;
-					if (p_wb_slave.WE_I)
+					if (p_wb_slave.WE_I) {
 						address=p_wb_slave.DAT_I.read();
+            std::cout << "Video_OUT : Got address " << address << std::endl;
+          }
 					p_wb_slave.DAT_O=address;
 			}
 		}
