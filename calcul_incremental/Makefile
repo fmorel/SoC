@@ -40,4 +40,3 @@ clean: soft_clean
 
 soft_clean:
 	$(MAKE) -C soft clean
-
