@@ -16,8 +16,9 @@
 typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
 // Sync
-#define LINE_SYNC       ((int)((25000000/(60*(HEIGHT+40)))-WIDTH))
+#define TARGET_FPS 			60
 #define ENDFRAME_SYNC   40
+#define LINE_SYNC       ((int)((25000000/(TARGET_FPS*(HEIGHT+ENDFRAME_SYNC)))-WIDTH))
 #define FRAME_SYNC      (WIDTH +LINE_SYNC) * ENDFRAME_SYNC
 
 // Define chunk size of bus access (given in words) 
