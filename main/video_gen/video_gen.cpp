@@ -120,7 +120,7 @@ reset:
 
         // Calcul du nom de la prochaine image.
         // Si ce nom ne correspond a aucun fichier, on remet l'index a zero
-        sprintf(filename, "%s%02d.png", base_name, current_image_number);
+        sprintf(filename, "img/%s/%s%02d.png", base_name,base_name, current_image_number);
 
 
         // on désalloue l'espace mémoire occupé par l'image précédente
@@ -133,7 +133,7 @@ reset:
         if(file == NULL) {
             // On reessaye la première image
             current_image_number = 0;
-            sprintf(filename, "%s%02d.png", base_name, current_image_number);
+            sprintf(filename, "img/%s/%s%02d.png", base_name,base_name, current_image_number);
             file = fopen(filename, "rb");
             // Si la première image n'existe pas on quite
             if(file == NULL) {
