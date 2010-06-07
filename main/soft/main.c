@@ -32,6 +32,7 @@
 #include "process.h"
 #include "lm32_irq.h"
 #include "segmentation.h"
+#include "my_printf.h"
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
@@ -40,6 +41,7 @@
 
 volatile unsigned int video_in_index;
 volatile unsigned int processing_index;
+int overwriting;
 volatile int difference;
 volatile uint32_t last_processed_image;
 image_t images[IMAGES_NUMBER] = { { { 0 } } };
@@ -49,7 +51,10 @@ void video_in_handler() {
   VIDEO_IN  = (uint32_t)&images[(video_in_index)%IMAGES_NUMBER] ;
   if ((video_in_index - processing_index) <2) {
     video_in_index++;
-  }
+		overwriting = 0;
+  } else {
+		overwriting = 1;
+	}
 }
 
 void video_out_handler() {
@@ -60,7 +65,10 @@ void video_out_handler() {
 
 void video_processing_task() {
   for(;;) {
-    while((video_in_index - processing_index ) < 2);
+		//Wait until :
+	  //We are not overwriting images and difference is >=2
+		//OR we are overwriting images and difference is >=1
+    while((video_in_index - processing_index ) < (2-overwriting));
 
     uint32_t image_address = (uint32_t)&images[processing_index];
     my_printf("Processing image : %x\n\r",image_address);
@@ -80,6 +88,7 @@ int main(void) {
 
   processing_index = 0;
   video_in_index = 1;
+	overwriting = 0;
   last_processed_image = (uint32_t)&images[IMAGES_NUMBER-1];
 
   //Initialize VIDEO_IN
