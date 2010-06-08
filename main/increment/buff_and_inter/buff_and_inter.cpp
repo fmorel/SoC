@@ -65,7 +65,7 @@ namespace soclib {
 	    buffer.buffer_write_enable(signal_write_enable);
 	    buffer.buffer_in(signal_buffer_in);
 	}
-  template <typename wb_param> \
+  template <typename wb_param> 
     void VideoOut<wb_param>::slaveTransition() {
       if(p_resetn==false) {
         slaveState=SLAVE_IDLE;
@@ -84,7 +84,7 @@ namespace soclib {
 
     }
   
-  template <typename wb_param> \
+  template <typename wb_param>
     void VideoOut<wb_param>::slaveMoore() {
       switch(slaveState) {
         case SLAVE_IDLE:
@@ -102,10 +102,13 @@ namespace soclib {
 	template <typename wb_param> \
 	  void BufInter<wb_param>::BufInterTransition() {
       
-      if (p_resetn == false)
+      if (p_resetn == false ) {
         next_state=WB_LOADING_START;
         state=WB_LOADING_START;
-      
+        loading_base_address=RAM_BASE;
+        return;
+      }
+
       switch(state) {
 		      case LOADING:
             if (loaded)

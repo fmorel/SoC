@@ -33,15 +33,12 @@
 
 // SocLib
 #include "mapping_table.h"
-#include "iss2_simhelper.h"
-#include "lm32.h"
 #include "vci_ram.h"
 #include "vci_rom.h"
 #include "vci_multi_tty.h"
 
 #include "wb_signal.h"
 
-#include "wb_xcache_wrapper.h"
 
 // WB interconnect
 #include "wb_interco.h"
@@ -50,306 +47,211 @@
 
 // locals
 #include "segmentation.h"
-//#include "video_gen.h"
+#include "buff_inter.h"
 
-#include "increment.h"
-
-//Wb simple slave
-//#include "video_out.h"
+//our module
+#include "buff_and_inter.h"
 
 
 // real SystemC main
 int _main(int argc, char *argv[])
 {
-    using namespace sc_core;
-    // Avoid repeating these everywhere
-    using soclib::common::IntTab;
-    using soclib::common::Segment;
+  using namespace sc_core;
+  // Avoid repeating these everywhere
+  using soclib::common::IntTab;
+  using soclib::common::Segment;
 
-    // Define our VCI parameters
-    typedef soclib::caba::VciParams<4,8,32,1,1,1,8,1,1,1> vci_param;
+  // Define our VCI parameters
+  typedef soclib::caba::VciParams<4,8,32,1,1,1,8,1,1,1> vci_param;
 
-    // Define our WB parameters
-    typedef soclib::caba::WbParams<32,32> wb_param;
+  // Define our WB parameters
+  typedef soclib::caba::WbParams<32,32> wb_param;
 
-    // Mapping table
-    soclib::common::MappingTable maptab(32, IntTab(8), IntTab(8), 0x80000000);
+  // Mapping table
+  soclib::common::MappingTable maptab(32, IntTab(8), IntTab(8), 0x80000000);
 
-    maptab.add(Segment("rom" , ROM_BASE , ROM_SIZE , IntTab(0), true));
-    maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
-    maptab.add(Segment("tty"  , TTY_BASE  , TTY_SIZE  , IntTab(2), false));
-    //add simple slave
-    maptab.add(Segment("increment", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), false));
+  maptab.add(Segment("rom" , ROM_BASE , ROM_SIZE , IntTab(0), true));
+  maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
+  //add simple slave
+  maptab.add(Segment("buffer" , BUFFER_BASE , BUFFER_SIZE , IntTab(2), false));
 
-    // Gloabal signals
-    sc_time     clk_periode(10, SC_NS); // clk period
-    //sc_time	video_clk_periode(40,SC_NS);	//video clk at 25MHz
-    sc_clock	signal_clk("signal_clk",clk_periode);
-    //sc_clock 	signal_video_clk("signal_video_clk",video_clk_periode);
+  // Gloabal signals
+  sc_time     clk_periode(10, SC_NS); // clk period
+  //sc_time	video_clk_periode(40,SC_NS);	//video clk at 25MHz
+  sc_clock	signal_clk("signal_clk",clk_periode);
+  //sc_clock 	signal_video_clk("signal_video_clk",video_clk_periode);
 
-    sc_signal<bool> signal_resetn("signal_resetn");
+  sc_signal<bool> signal_resetn("signal_resetn");
 
-    //Video signals
-    //    sc_signal<bool>        line_valid("line_val");
-    //    sc_signal<bool>        frame_valid("frame_val");
-    //    sc_signal<unsigned char> pixel("pixel_val");
+  /****************************************
+   ************ BufInter ports ************
+   ****************************************/
+  ////// data ports ///////
+  //x and y used during interpolation phase
+  sc_signal<float>   buff_inter_x;
+  sc_signal<float>   buff_inter_y;
+  //x_min and y_min used during the buff_inter_buffering  phase
+  sc_signal<float>   buff_inter_x_min;
+  sc_signal<float>   buff_inter_y_min;
+  //main output
+  sc_signal<char>    buff_inter_intensity;
 
+  //////  control ports /////
+  sc_signal<bool>    buff_inter_new_tile;
+  sc_signal<bool>    buff_inter_ask_for_x_y;
+  sc_signal<bool>    buff_inter_valid;
 
-    // interconnection signals
-    soclib::caba::VciSignals<vci_param> signal_vci_tty("signal_vci_tty");
-    soclib::caba::VciSignals<vci_param> signal_vci_rom("signal_vci_vcirom");
-    soclib::caba::VciSignals<vci_param> signal_vci_ram("signal_vci_vciram");
+  //WB master
+  soclib::caba::WbSignal<wb_param> buff_inter_master("signal_buffer_master");
 
-    // WB interconnect signals
-    soclib::caba::WbSignal<wb_param> signal_wb_lm32("signal_wb_lm32");
-    soclib::caba::WbSignal<wb_param> signal_wb_ram("signal_wb_ram");
-    soclib::caba::WbSignal<wb_param> signal_wb_rom("signal_wb_rom");
-    soclib::caba::WbSignal<wb_param> signal_wb_tty("signal_wb_tty");
-    
-    //WB slave	
-    //    soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
-    //    //WB master
-    //    soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
-    //
-    //
-    
-    //WB slave	
-    soclib::caba::WbSignal<wb_param> signal_increment_slave("signal_increment_slave");
-    //WB master
-    soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
-
-    /*DEBUG*/    // Increment Signals
-    /*DEBUG*/    sc_signal<float>	signal_x_display;
-    /*DEBUG*/    sc_signal<float>	signal_x_min_display;
-    /*DEBUG*/    sc_signal<float>	signal_y_display;
-    /*DEBUG*/    sc_signal<float>	signal_y_min_display;
-    /*DEBUG*/    sc_signal<bool>	signal_new_tile_display;
-    /*DEBUG*/    sc_signal<bool>	signal_ask_for_x_y_display;
-    /*DEBUG*/    sc_signal<char>	signal_intensity_display;
-    /*DEBUG*/    sc_signal<bool>	signal_valid_display;
-
-    //video signals
-    //    sc_signal<bool> frame_valid_out("frame_valid_out");
-    //    sc_signal<bool> line_valid_out("line_valid_out");
-    //    sc_signal<unsigned char> pixel_out("pixel_out");
-    //
-
-    // irq from uart
-    sc_signal<bool> signal_tty_irq("signal_tty_irq");
-
-    //irq from video_out
-    //    sc_signal<bool> signal_video_out_irq("video_out_irq");
-    // unconnected irqs
-    sc_signal<bool> unconnected_irq ("unconnected_irq");
-
-    ////////////////////////////////////////////////////////////
-    /////////////////////// Components /////////////////////////
-    ////////////////////////////////////////////////////////////
+  //WB slave
+  soclib::caba::WbSignal<wb_param> buff_inter__slave("signal_buffer_master");
 
 
-    // lm32 real cache configuration can be:
-    // Ways 1 or 2
-    // Sets 128,256,512 or 1024
-    // Bytes per line 4, 8 or 16
-    // Here we have 2 way, 128 set and 8 bytes per set
-    // To simulate a processor without a these parameters should be
-    // changed to 1,1,4
-    
-    soclib::caba::WbXcacheWrapper
-	<wb_param, soclib::common::Iss2Simhelper<soclib::common::LM32Iss <false > > >
-	lm32("lm32", 0, maptab,IntTab(0), 2,128,8, 2,128,8);
 
-    // elf loader
-    soclib::common::Loader loader("soft/soft.elf");
+  // interconnection signals
+  soclib::caba::VciSignals<vci_param> signal_vci_rom("signal_vci_vcirom");
+  soclib::caba::VciSignals<vci_param> signal_vci_ram("signal_vci_vciram");
 
-    // memories
-    soclib::caba::VciRom<vci_param> rom("rom", IntTab(0), maptab, loader);
-    soclib::caba::VciRam<vci_param> ram("ram", IntTab(1), maptab, loader);
-    soclib::caba::VciMultiTty<vci_param> vcitty("vcitty",	IntTab(2), maptab, "tty.log", NULL);
-
-    // WB interconnect
-    //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 2,4);
-
-    //VideoGen
-    //soclib::caba::VideoGen my_videogen ("video_gen");
-
-    //we do not clock videogen
-    //    my_videogen.clk (signal_resetn);
-    //    my_videogen.reset_n(signal_resetn);
-    //    my_videogen.line_valid(line_valid);
-    //    my_videogen.frame_valid(frame_valid);
-    //    my_videogen.pixel_out(pixel);
-    //
-    //    //VideoDisplay
-    //    soclib::caba::Display my_display ("My_display");
-    //
-    //    my_display.clk (signal_video_clk);
-    //    my_display.reset_n(signal_resetn);
-    //    my_display.line_valid(line_valid_out);
-    //    my_display.frame_valid(frame_valid_out);
-    //    my_display.pixel_in(pixel_out);
-    //
-    //Increment
-    soclib::caba::Increment<wb_param> increment("increment");
-    increment.p_clk (signal_clk);
-    increment.p_resetn (signal_resetn);
-    increment.p_wb_slave (signal_increment_slave);
-    increment.p_wb_master (signal_increment_master);
+  // WB interconnect signals
+  soclib::caba::WbSignal<wb_param> signal_wb_ram("signal_wb_ram");
+  soclib::caba::WbSignal<wb_param> signal_wb_rom("signal_wb_rom");
 
 
-    /*DEBUG*/	    increment.x_display(signal_x_display);
-    /*DEBUG*/	    increment.x_min_display(signal_x_min_display);
-    /*DEBUG*/	    increment.y_display(signal_y_display);
-    /*DEBUG*/	    increment.y_min_display(signal_y_min_display);
-    /*DEBUG*/	    increment.new_tile_display(signal_new_tile_display);
-    /*DEBUG*/	    increment.ask_for_x_y_display(signal_ask_for_x_y_display);
-    /*DEBUG*/	    increment.intensity_display(signal_intensity_display);
-    /*DEBUG*/	    increment.valid_display(signal_valid_display);
 
-    ////////////////////////////////////////////////////////////
-    /////////////////// WB -> VCI Wrappers /////////////////////
-    ////////////////////////////////////////////////////////////
 
-    // ram
-    soclib::caba::WbSlaveVciInitiatorWrapper<vci_param, wb_param> ram_w ("ram_w") ;
-    ram_w.p_clk               (signal_clk);
-    ram_w.p_resetn            (signal_resetn);
-    ram_w.p_vci               (signal_vci_ram);
-    ram_w.p_wb                (signal_wb_ram);
 
-    // rom
-    soclib::caba::WbSlaveVciInitiatorWrapper<vci_param, wb_param> rom_w ("rom_w") ;
-    rom_w.p_clk               (signal_clk);
-    rom_w.p_resetn            (signal_resetn);
-    rom_w.p_vci               (signal_vci_rom);
-    rom_w.p_wb                (signal_wb_rom);
+  ////////////////////////////////////////////////////////////
+  /////////////////////// Components /////////////////////////
+  ////////////////////////////////////////////////////////////
 
-    // tty
-    soclib::caba::WbSlaveVciInitiatorWrapper<vci_param, wb_param> tty_w ("tty_w") ;
-    tty_w.p_clk               (signal_clk);
-    tty_w.p_resetn            (signal_resetn);
-    tty_w.p_vci               (signal_vci_tty);
-    tty_w.p_wb                (signal_wb_tty);
 
-    ////////////////////////////////////////////////////////////
-    //    ////////////////////// Video_out ////////////////////////////
-    //    ////////////////////////////////////////////////////////////
-    //    soclib::caba::VideoOut<wb_param> video_out("video_out");
-    //    video_out.p_clk (signal_clk);
-    //    video_out.p_video_clk (signal_video_clk);
-    //    video_out.p_resetn (signal_resetn);
-    //    video_out.p_wb_slave (signal_video_out_slave);
-    //    video_out.p_wb_master (signal_video_out_master);
-    //    video_out.p_frame_valid (frame_valid_out);
-    //    video_out.p_line_valid (line_valid_out);
-    //    video_out.p_pixel_out (pixel_out);
-    //    video_out.p_interrupt (signal_video_out_irq);
-    //
-    ////////////////////////////////////////////////////////////
-    ///////////////////// WB Net List //////////////////////////
-    ////////////////////////////////////////////////////////////
+  // memories
+  soclib::caba::VciRom<vci_param> rom("rom", IntTab(0), maptab, loader);
+  soclib::caba::VciRam<vci_param> ram("ram", IntTab(1), maptab, loader);
 
-    wbinterco.p_clk(signal_clk);
-    wbinterco.p_resetn(signal_resetn);
+  // WB interconnect
+  //                                           sc_name    maptab  masters slaves
+  soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 1,3);
 
-    wbinterco.p_from_master[0](signal_wb_lm32);
-    wbinterco.p_from_master[1](signal_increment_master);
-    wbinterco.p_to_slave[0](signal_wb_rom);
-    wbinterco.p_to_slave[1](signal_wb_ram);
-    wbinterco.p_to_slave[2](signal_wb_tty);
-    wbinterco.p_to_slave[3](signal_increment_slave);
+  //VideoGen
+  //soclib::caba::VideoGen my_videogen ("video_gen");
 
-    // lm32
-    lm32.p_clk(signal_clk);
-    lm32.p_resetn(signal_resetn);
-    lm32.p_wb(signal_wb_lm32);
-    // !! the real LM32 irq are active low
-    // To avoid adding inverters here, we consider
-    // them active high
-    lm32.p_irq[0] (signal_tty_irq);
-    //lm32.p_irq[1] (signal_video_out_irq);
-    for (int i=1; i<32; i++)
-	lm32.p_irq[i] (unconnected_irq);
+  //buff_inter
+  soclib::caba::BufInter<wb_param> buff_inter("buff_inter");
+  buff_inter.p_clk (signal_clk);
+  buff_inter.p_resetn (signal_resetn);
+  buff_inter.p_wb_slave (buff_inter_slave);
+  buff_inter.p_wb_master (buff_inter_master);
+  buff_inter.x(buff_inter_x);
+  buff_inter.y(buff_inter_y);
+  buff_inter.x_min(buff_inter_x_min);
+  buff_inter.y_min(buff_inter_y_min);
+  buff_inter.intensity(buff_inter_intensity);
+  buff_inter.new_tile(buff_inter_new_tile);
+  buff_inter.ask_for_x_y(buff_inter_ask_for_x_y);
+  buff_inter.valid(buff_inter_valid);
+  ////////////////////////////////////////////////////////////
+  /////////////////// WB -> VCI Wrappers /////////////////////
+  ////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////
-    //////////////////// VCI Net List //////////////////////////
-    ////////////////////////////////////////////////////////////
+  // ram
+  soclib::caba::WbSlaveVciInitiatorWrapper<vci_param, wb_param> ram_w ("ram_w") ;
+  ram_w.p_clk               (signal_clk);
+  ram_w.p_resetn            (signal_resetn);
+  ram_w.p_vci               (signal_vci_ram);
+  ram_w.p_wb                (signal_wb_ram);
 
-    // rom
-    rom.p_clk(signal_clk);
-    rom.p_resetn(signal_resetn);
-    rom.p_vci(signal_vci_rom);
+  // rom
+  soclib::caba::WbSlaveVciInitiatorWrapper<vci_param, wb_param> rom_w ("rom_w") ;
+  rom_w.p_clk               (signal_clk);
+  rom_w.p_resetn            (signal_resetn);
+  rom_w.p_vci               (signal_vci_rom);
+  rom_w.p_wb                (signal_wb_rom);
 
-    // ram
-    ram.p_clk(signal_clk);
-    ram.p_resetn(signal_resetn);
-    ram.p_vci(signal_vci_ram);
 
-    // uart
-    vcitty.p_clk(signal_clk);
-    vcitty.p_resetn(signal_resetn);
-    vcitty.p_vci(signal_vci_tty);
-    vcitty.p_irq[0](signal_tty_irq);
+  ///////////////////// WB Net List //////////////////////////
+  ////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////
-    //////////////// Traces ////////////////////////////////////
-    ////////////////////////////////////////////////////////////
+  wbinterco.p_clk(signal_clk);
+  wbinterco.p_resetn(signal_resetn);
+
+  wbinterco.p_from_master[0](buff_inter_master);
+  wbinterco.p_to_slave[0](signal_wb_rom);
+  wbinterco.p_to_slave[1](signal_wb_ram);
+  wbinterco.p_to_slave[2](buff_inter_slave);
+
+  ////////////////////////////////////////////////////////////
+  //////////////////// VCI Net List //////////////////////////
+  ////////////////////////////////////////////////////////////
+
+  // rom
+  rom.p_clk(signal_clk);
+  rom.p_resetn(signal_resetn);
+  rom.p_vci(signal_vci_rom);
+
+  // ram
+  ram.p_clk(signal_clk);
+  ram.p_resetn(signal_resetn);
+  ram.p_vci(signal_vci_ram);
+
+
+  ////////////////////////////////////////////////////////////
+  //////////////// Traces ////////////////////////////////////
+  ////////////////////////////////////////////////////////////
 
 #ifdef DO_TRACES
-    sc_trace_file *TRACEFILE;
-    TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
-    //sc_trace (TRACEFILE, signal_resetn, "resetn" );
-    sc_trace (TRACEFILE, signal_clk,    "clk"    );
-    sc_trace (TRACEFILE, signal_x_display ,"x");
-    sc_trace (TRACEFILE, signal_x_min_display ,"x_min");
-    sc_trace (TRACEFILE, signal_y_display ,"y");
-    sc_trace (TRACEFILE, signal_y_min_display ,"y_min");
-    sc_trace (TRACEFILE, signal_new_tile_display ,"new_tile");
-    sc_trace (TRACEFILE, signal_ask_for_x_y_display ,"ask_for_x_y");
-    sc_trace (TRACEFILE, signal_intensity_display ,"intensity");
-    sc_trace (TRACEFILE, signal_valid_display ,"valid");
+  sc_trace_file *TRACEFILE;
+  TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
+  //sc_trace (TRACEFILE, signal_resetn, "resetn" );
+  //sc_trace (TRACEFILE, signal_clk,    "clk"    );
+  sc_trace (TRACEFILE, buff_inter_wb_master ,"master");
+  sc_trace (TRACEFILE, buff_inter_x_min ,"x_min");
+  sc_trace (TRACEFILE, buff_inter_y_min ,"y_min");
+  sc_trace (TRACEFILE, buff_valid ,"valid");
+  sc_trace (TRACEFILE, buff_ask_for_x_y ,"valid");
+  sc_trace (TRACEFILE, buff_new_tile ,"valid");
 
 #endif
 
-    ////////////////////////////////////////////////////////////
-    //////////////// Start Simulation //////////////////////////
-    ////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //////////////// Start Simulation //////////////////////////
+  ////////////////////////////////////////////////////////////
 
-    // unconnected irqs
-    unconnected_irq = false;
-    // reset
-    sc_start(sc_core::sc_time(0, SC_NS));
-    signal_resetn = false;
-    sc_start(sc_core::sc_time(1, SC_NS));
-    signal_resetn = true;
+  // reset
+  sc_start(sc_core::sc_time(0, SC_NS));
+  signal_resetn = false;
+  sc_start(sc_core::sc_time(1, SC_NS));
+  signal_resetn = true;
 
-    // print maping table
-    std::cout << "Let's go..." << std::endl;
-    std::cout << maptab;
+  // print maping table
+  std::cout << "Let's go..." << std::endl;
+  std::cout << maptab;
 
-    // run SystemC simulator
-    // sc_start(sc_core::sc_time(1000, SC_NS));
-    sc_start( );
+  // run SystemC simulator
+  buff_inter_x_min=0;
+  buff_inter_y_min=0;
+  // sc_start(sc_core::sc_time(1000, SC_NS));
+  sc_start( );
 
 #ifdef DO_TRACES
-    sc_close_vcd_trace_file(TRACEFILE);
+  sc_close_vcd_trace_file(TRACEFILE);
 #endif
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 // fake sc_man to catch exceptions
 int sc_main(int argc, char *argv[])
 {
-    try {
-	return _main(argc, argv);
-    } catch (std::exception &e) {
-	std::cout << e.what() << std::endl;
-    } catch (...) {
-	std::cout << "Unknown exception occured" << std::endl;
-	throw;
-    }
-    return 1;
+  try {
+    return _main(argc, argv);
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+  } catch (...) {
+    std::cout << "Unknown exception occured" << std::endl;
+    throw;
+  }
+  return 1;
 }
 

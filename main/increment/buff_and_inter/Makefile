@@ -1,40 +1,43 @@
-SYSTEMC		= /comelec/softs/opt/systemc-2.2.0
-TARGET_ARCH	= linux64
+SIM_BINARY = simulation.x
+SOFT       = soft/soft.elf
+OUTPUT_LOG = simu.log
 
-SOCLIB_PATH = /comelec/softs/opt/www.soclib.fr/distrib/soclib
+PLATFORM_DESC    =  platform_desc
+SOCLIB_INCLUDES  = -I.
+SOCLIB_CC_ARGS   = -j4 -p $(PLATFORM_DESC) $(SOCLIB_INCLUDES)
 
-CXX         = g++
-LD	    = g++
-CXXFLAGS    = -Wall  -I. -I$(SYSTEMC)/include  -Wno-deprecated -O2 -g
-LDFLAGS	    =  -L$(SYSTEMC)/lib-$(TARGET_ARCH) 
+SOCLIB_CC = soclib-cc
 
-SOURCES_CPP = $(wildcard *.cpp)
-SOURCES_C   = $(wildcard *.c)
-OBJS        = $(SOURCES_CPP:.cpp=.o)
-OBJS       += $(SOURCES_C:.c=.o)
-EXE	    = simulation.x
+SOCLIB = $(shell $(SOCLIB_CC) --getpath)
+export SOCLIB
 
-all: $(EXE) 
 
-$(EXE) : $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -o $@  -lsystemc -lpng 2>&1 | c++filt
+.PHONY: all soft simlog soft_clean $(SIM_BINARY)
 
-.cpp.o: .deps
-	$(CXX) $(CXXFLAGS) -I$(SOCLIB_PATH)/soclib/communication/wishbone/caba/source/include/ -c -o $@ $<
 
-.c.o: .deps
-	$(CC) $(CFLAGS) -c -o $@ $<
+all: test_soclib $(SIM_BINARY) soft
 
-.deps : $(SOURCES_CPP) $(SOURCES_C)
-	$(CXX) $(CXXFLAGS) -I$(SOCLIB_PATH)/soclib/communication/wishbone/caba/source/include/ -MM $(SOURCES_CPP) $(SOURCES_C) > $@
+soft:
+	$(MAKE) -C soft
 
--include .deps
+test_soclib:
+	@test -z "$(SOCLIB)" && (\
+	echo "You must have soclib-cc in your $$PATH" ; exit 1 ) || exit 0
+	@test ! -z "$(SOCLIB)"
 
-clean :
-	-rm -f *.o *~ *_old $(EXE)
-	-rm -f simulation.x 
-	-rm -f core
-	-rm -f *.vcd
-	-rm -f .deps
-	-rm -f *.swp
+$(SIM_BINARY): $(PLATFORM_DESC)
+	$(SOCLIB_CC) -P $(SOCLIB_CC_ARGS) $(SOCLIB_CC_ADD_ARGS) -o $@
+
+simlog: $(SIM_BINARY) soft
+	set -o pipefail ; SOCLIB_TTY=TERM ./$(SIM_BINARY) $(SIMULATION_ARGS) < /dev/null 2>&1 | tee $(OUTPUT_LOG)
+
+
+clean: soft_clean
+	$(SOCLIB_CC) -P $(SOCLIB_CC_ARGS) $(SOCLIB_CC_ADD_ARGS) -x -o $(SIM_BINARY)
+	rm -f tty.log
+	rm -f vcd_traces.vcd
+	rm -f $(OUTPUT_LOG)
+
+soft_clean:
+	$(MAKE) -C soft clean
 
