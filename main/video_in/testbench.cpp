@@ -48,6 +48,13 @@ int _main(int argc, char* argv[]) {
 
   //TODO
   //Est-ce qu'on veut tester ce module indépendant du wishbone ?
+  sc_start(sc_core::sc_time(0, SC_NS));
+  signal_resetn = false;
+  sc_start(sc_core::sc_time(1, SC_NS));
+  signal_resetn = true;
+  sc_start(sc_core::sc_time(9, SC_NS));
+  signal_resetn = true;
+
 
   return EXIT_FAILURE;
 }
