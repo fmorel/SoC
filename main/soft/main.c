@@ -70,7 +70,7 @@ void video_processing_task() {
 		//OR we are overwriting images and difference is >=1
     while((video_in_index - processing_index ) < (2-overwriting));
 
-    uint32_t image_address = (uint32_t)&images[processing_index];
+    uint32_t image_address = (uint32_t)&images[processing_index%IMAGES_NUMBER];
     my_printf("Processing image : %x\n\r",image_address);
     vProcessImage(*((image_t *)image_address));
     my_printf("Processed image : %x\n\r",image_address);
