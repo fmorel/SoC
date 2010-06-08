@@ -1,3 +1,3 @@
 include $(BASE_DIR)/variables.inc
-SUBMODULES = 
+SUBMODULES = buffer increment_hard interpolation
 include $(BASE_DIR)/rules.inc
