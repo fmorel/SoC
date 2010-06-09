@@ -8,8 +8,7 @@ namespace soclib { namespace caba {
 
   class Interpolation: public sc_core::sc_module{
     private:
-      float x,y;
-      int Ex,Ey;
+      float x,y,prevx,prevy,prevprevx,prevprevy;
       unsigned char  intensities[4];
     protected:
       SC_HAS_PROCESS(Interpolation);
