@@ -35,7 +35,6 @@
 #include "mapping_table.h"
 #include "vci_ram.h"
 #include "vci_rom.h"
-#include "vci_multi_tty.h"
 
 #include "wb_signal.h"
 
@@ -47,7 +46,7 @@
 
 // locals
 #include "segmentation.h"
-#include "buff_inter.h"
+#include "buff_and_inter.h"
 
 //our module
 #include "buff_and_inter.h"
@@ -105,7 +104,7 @@ int _main(int argc, char *argv[])
   soclib::caba::WbSignal<wb_param> buff_inter_master("signal_buffer_master");
 
   //WB slave
-  soclib::caba::WbSignal<wb_param> buff_inter__slave("signal_buffer_master");
+  soclib::caba::WbSignal<wb_param> buff_inter_slave("signal_buffer_master");
 
 
 
@@ -127,8 +126,8 @@ int _main(int argc, char *argv[])
 
 
   // memories
-  soclib::caba::VciRom<vci_param> rom("rom", IntTab(0), maptab, loader);
-  soclib::caba::VciRam<vci_param> ram("ram", IntTab(1), maptab, loader);
+  soclib::caba::VciRom<vci_param> rom("rom", IntTab(0), maptab);
+  soclib::caba::VciRam<vci_param> ram("ram", IntTab(1), maptab);
 
   // WB interconnect
   //                                           sc_name    maptab  masters slaves
@@ -205,12 +204,12 @@ int _main(int argc, char *argv[])
   TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
   //sc_trace (TRACEFILE, signal_resetn, "resetn" );
   //sc_trace (TRACEFILE, signal_clk,    "clk"    );
-  sc_trace (TRACEFILE, buff_inter_wb_master ,"master");
+  sc_trace (TRACEFILE, buff_inter_master ,"master");
   sc_trace (TRACEFILE, buff_inter_x_min ,"x_min");
   sc_trace (TRACEFILE, buff_inter_y_min ,"y_min");
-  sc_trace (TRACEFILE, buff_valid ,"valid");
-  sc_trace (TRACEFILE, buff_ask_for_x_y ,"valid");
-  sc_trace (TRACEFILE, buff_new_tile ,"valid");
+  sc_trace (TRACEFILE, buff_inter_valid ,"valid");
+  sc_trace (TRACEFILE, buff_inter_ask_for_x_y ,"ask");
+  sc_trace (TRACEFILE, buff_inter_new_tile ,"new_tile");
 
 #endif
 
@@ -229,8 +228,8 @@ int _main(int argc, char *argv[])
   std::cout << maptab;
 
   // run SystemC simulator
-  buff_inter_x_min=0;
-  buff_inter_y_min=0;
+  buff_inter_x_min=10.5;
+  buff_inter_y_min=49.245;
   // sc_start(sc_core::sc_time(1000, SC_NS));
   sc_start( );
 

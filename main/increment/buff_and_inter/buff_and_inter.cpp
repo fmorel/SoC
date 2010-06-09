@@ -18,12 +18,12 @@ namespace soclib {
 	    p_clk("p_clk"),
 	    p_resetn("p_resetn"),
 	    x("x"),
-	    x_min("x_min"),
 	    y("y"),
+	    x_min("x_min"),
 	    y_min("y_min"),
+	    intensity("intensity"),
 	    new_tile("new_tile"),
 	    ask_for_x_y("ask_for_x_y"),
-	    intensity("intensity"),
 	    valid("valid")
 	{
 
@@ -66,7 +66,7 @@ namespace soclib {
 	    buffer.buffer_in(signal_buffer_in);
 	}
   template <typename wb_param> 
-    void VideoOut<wb_param>::slaveTransition() {
+    void BufInter<wb_param>::slaveTransition() {
       if(p_resetn==false) {
         slaveState=SLAVE_IDLE;
         return;
@@ -85,7 +85,7 @@ namespace soclib {
     }
   
   template <typename wb_param>
-    void VideoOut<wb_param>::slaveMoore() {
+    void BufInter<wb_param>::slaveMoore() {
       switch(slaveState) {
         case SLAVE_IDLE:
           p_wb_slave.ACK_O=0;
@@ -116,6 +116,7 @@ namespace soclib {
             break;
           
           case WB_LOADING_START:
+            std::cout <<"Start...."<<std::endl;
             x_min_integer=x_min.read();
             //pad the x_min value to the beginning of a word
             //i.e remove the last two bits
@@ -150,8 +151,10 @@ namespace soclib {
 
           case WB_LOADING_ENDLINE:
             next_state=WB_LOADING_WAIT;
+            break;
 
           case WB_LOADING_END:
+            i=0;
             next_state=INTERPOLING;
             break;
 
@@ -196,6 +199,8 @@ namespace soclib {
 
       case WB_LOADING_START:
         new_tile=false;
+        valid=false;
+        interpoled=false;
         break;
        
       case WB_LOADING_WAIT:
