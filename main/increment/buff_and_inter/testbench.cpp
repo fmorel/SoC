@@ -93,7 +93,7 @@ int _main(int argc, char *argv[])
   sc_signal<float>   buff_inter_x_min;
   sc_signal<float>   buff_inter_y_min;
   //main output
-  sc_signal<char>    buff_inter_intensity;
+  sc_signal<unsigned char>    buff_inter_intensity;
 
   //////  control ports /////
   sc_signal<bool>    buff_inter_new_tile;

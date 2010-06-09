@@ -23,8 +23,6 @@ namespace soclib { namespace caba {
         
         //FSM states
         enum BufInterStates {
-          IDLE,
-          LOADING,
           //states of the wb_master
           WB_LOADING_START,
           WB_LOADING_WAIT,
@@ -32,7 +30,9 @@ namespace soclib { namespace caba {
           WB_LOADING_ENDLINE,
           WB_LOADING_END,
           //states of the interpolator
-          INTERPOLING
+          WAIT_FOR_INCR,
+          INTERPOLING,
+          NEW_TILE
         };
 
         //internal signals
@@ -42,7 +42,6 @@ namespace soclib { namespace caba {
         sc_signal<float> signal_y;
         sc_signal<int>   signal_buffer_command[2];
         sc_signal<unsigned char>   signal_buffer_out[4];
-        sc_signal<unsigned char>  signal_intensity;
 
         //used by the wb master
         int state;
@@ -72,7 +71,7 @@ namespace soclib { namespace caba {
         sc_core::sc_in<float>   x_min;
         sc_core::sc_in<float>   y_min;
         //the final output
-        sc_core::sc_out<char>   intensity;
+        sc_core::sc_out<unsigned char>   intensity;
 
         ////// control ports /////
         sc_core::sc_out<bool>   new_tile;

@@ -50,7 +50,7 @@ namespace soclib {
       interpolation.p_resetn(p_resetn);
       interpolation.p_x(signal_x);
       interpolation.p_y(signal_y);
-      interpolation.p_out(signal_intensity);
+      interpolation.p_out(intensity);
       int i;
       for(i = 0;i<2;i++){
         buffer.buffer_command_out[i](signal_buffer_command[i]);
@@ -110,10 +110,6 @@ namespace soclib {
       }
 
       switch(state) {
-		      case LOADING:
-            if (loaded)
-		         next_state=INTERPOLING;
-            break;
           
           case WB_LOADING_START:
             x_min_integer=x_min.read();
@@ -125,7 +121,6 @@ namespace soclib {
             loading_word=0;
             loading_line=0;
             address=base_address+x_min_integer+WIDTH*y_min_integer;
-            std::cout <<"Start.., address=" << address <<std::endl; 
             next_state=WB_LOADING_WAIT;
             break;
 
@@ -160,23 +155,29 @@ namespace soclib {
 
           case WB_LOADING_END:
             i=0;
-            next_state=INTERPOLING;
+            next_state=WAIT_FOR_INCR;
             break;
 
-
+          case WAIT_FOR_INCR:
+            i++;
+            //TODO: needs to be ajusted
+            if (i==3) {
+              i=0;
+              next_state=INTERPOLING;
+            }
+            break;
 
           case INTERPOLING:
-            if (interpoled)
-              //initial behaviour
-		          //next_state=LOADING;
-              next_state=WB_LOADING_START;
+            i++;
+            //TODO: needs to be adjusted
+            if (i==257)
+              next_state=NEW_TILE;
             break;  
-
-
-          default:
+          
+          case NEW_TILE:
             next_state=WB_LOADING_START;
+
       }
-      intensity = signal_intensity;
 
       state=next_state;
   }
@@ -187,16 +188,6 @@ namespace soclib {
 		//		signal_x_min=x_min;
 		//		signal_y_min=y_min;
 		switch(state) {
-		    case LOADING : 
-			new_tile=false;
-			i++;
-			signal_write_enable=(i<256);
-			signal_buffer_in=0x12345678;
-			if(i==700){
-			    i=0;
-			    loaded=true;
-			}
-			break;
 
     /*************************************************
     ************* wishbone master states *************
@@ -205,7 +196,6 @@ namespace soclib {
       case WB_LOADING_START:
         new_tile=false;
         valid=false;
-        interpoled=false;
         break;
        
       case WB_LOADING_WAIT:
@@ -231,25 +221,23 @@ namespace soclib {
         p_wb_master.CYC_O=0;
         p_wb_master.STB_O=0;
         signal_write_enable=0;
+        ask_for_x_y=1;
         break;
 		    
         
      /************ Interpolation states **********/
         
-    case INTERPOLING :
-			i++;
-			if(i<3){
-			    ask_for_x_y = 1;
-			}
-			else if(i<258){
-			    valid=true;
-			}
-			else {
-			    interpoled=true;
-			    new_tile=true;
-			    i=0;
-			}
-			break;
+      case WAIT_FOR_INCR:
+			  ask_for_x_y = 0;
+			  break;
+
+      case INTERPOLING:
+        valid=1;
+        break;
+
+      case NEW_TILE:
+        valid=0;
+        new_tile=1;
 
 		}
 	}
