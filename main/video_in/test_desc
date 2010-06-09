@@ -1,0 +1,10 @@
+# -*- python -*-
+
+todo = Platform('caba', 'testbench.cpp',
+        uses = [
+				Uses('caba:video_in'),
+        ],
+        wb_data_width = 32,
+        wb_addr_width = 32,
+        )
+
