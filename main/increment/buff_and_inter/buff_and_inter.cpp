@@ -69,6 +69,7 @@ namespace soclib {
     void BufInter<wb_param>::slaveTransition() {
       if(p_resetn==false) {
         slaveState=SLAVE_IDLE;
+        base_address=RAM_BASE+0x800;
         return;
       }
       //received a valid message
@@ -94,8 +95,8 @@ namespace soclib {
         case SLAVE_REQ:
           p_wb_slave.ACK_O=1;
           if (p_wb_slave.WE_I)
-            loading_base_address=p_wb_slave.DAT_I.read();
-          p_wb_slave.DAT_O=loading_base_address;
+            base_address=p_wb_slave.DAT_I.read();
+          p_wb_slave.DAT_O=base_address;
       }
     }
 
@@ -105,7 +106,6 @@ namespace soclib {
       if (p_resetn == false ) {
         next_state=WB_LOADING_START;
         state=WB_LOADING_START;
-        loading_base_address=RAM_BASE;
         return;
       }
 
@@ -116,14 +116,16 @@ namespace soclib {
             break;
           
           case WB_LOADING_START:
-            std::cout <<"Start...."<<std::endl;
             x_min_integer=x_min.read();
             //pad the x_min value to the beginning of a word
             //i.e remove the last two bits
             x_min_integer &= 0x1111111C;
             y_min_integer=y_min.read();
+            
             loading_word=0;
             loading_line=0;
+            address=base_address+x_min_integer+WIDTH*y_min_integer;
+            std::cout <<"Start.., address=" << address <<std::endl; 
             next_state=WB_LOADING_WAIT;
             break;
 
@@ -136,10 +138,13 @@ namespace soclib {
 
           case WB_LOADING_WRITE:
             loading_word++;
+            address+=4;
             //end of a 32-pixel line
             if (loading_word==8) {
 		          loading_word=0;
+              address-=32;
               loading_line++;
+              address+=WIDTH;
               if (loading_line==32)
                 next_state=WB_LOADING_END;
               else
@@ -206,8 +211,8 @@ namespace soclib {
       case WB_LOADING_WAIT:
         p_wb_master.CYC_O=1;
         p_wb_master.STB_O=1;
-        p_wb_master.ADR_O=loading_base_address+(y_min_integer+loading_line)*WIDTH+x_min_integer+loading_word;
         p_wb_master.WE_O=0;
+        p_wb_master.ADR_O=address;
         signal_write_enable=0;
         break;
 

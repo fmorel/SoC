@@ -5,8 +5,9 @@
 #include <stdint.h>
 #include "wb_slave.h"
 #include "wb_master.h"
-#include "../buffer/buffer.h"
-#include "../interpolation/interpolation.h"
+#include "utils.h"
+#include "buffer.h"
+#include "interpolation.h"
 #include "segmentation.h"
 
 namespace soclib { namespace caba {
@@ -49,7 +50,7 @@ namespace soclib { namespace caba {
         uint32_t x_min_integer,y_min_integer;
         int loading_line,loading_word;
         uint32_t incoming_data;
-        uint32_t loading_base_address; 
+        uint64_t base_address,address; 
 
         //used by wb_slave
         int slaveState;
