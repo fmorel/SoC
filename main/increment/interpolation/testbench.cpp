@@ -65,10 +65,21 @@ int _main(int argc, char* argv[]) {
   signal_resetn = true;
   sc_start(sc_core::sc_time(9, SC_NS));
 
-
-
   cout << "Begining tests" << endl;
-  
+
+   //Check that out is okay Should be zero on reset
+  if (0!= signal_out) {
+    cout << "out failed !" << endl;
+    cout << (float)signal_out.read() << endl ;
+    test_failed++;
+  }
+  //Check that command_out is okay. Should be zero on reset
+  if (0 != signal_buffer_command[0] || 0 != signal_buffer_command[1]){
+    cout << "command_out failed !" << endl;
+    test_failed++;
+  }
+
+
   signal_x = 1.0;
   signal_y = 1.0;
   sc_start(sc_core::sc_time(10, SC_NS));
@@ -94,6 +105,9 @@ int _main(int argc, char* argv[]) {
     cout << "command_out failed !" << endl;
     test_failed++;
   }
+
+  signal_x =0.0;
+  signal_y =0.0;
   sc_start(sc_core::sc_time(10, SC_NS));
   //Check that out is okay
   if (0!= signal_out) {
@@ -101,6 +115,13 @@ int _main(int argc, char* argv[]) {
     cout << (float)signal_out.read() << endl ;
     test_failed++;
   }
+  //Check that command_out is okay
+  if (0 != signal_buffer_command[0] || 0 != signal_buffer_command[1]){
+    cout << "command_out failed !" << endl;
+    test_failed++;
+  }
+
+
   
   sc_start(sc_core::sc_time(10, SC_NS));
 //Check that out is okay
@@ -114,6 +135,14 @@ int _main(int argc, char* argv[]) {
     test_failed++;
   }
 
+  sc_start(sc_core::sc_time(10, SC_NS));
+ //Check that out is okay
+  if (0!= signal_out) {
+    cout << "out failed !" << endl;
+    cout << (float)signal_out.read() << endl ;
+    test_failed++;
+  }
+  
   sc_close_vcd_trace_file(TRACEFILE);
   if (test_failed>0) {
     return EXIT_FAILURE;

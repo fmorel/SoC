@@ -16,6 +16,9 @@ namespace soclib { namespace caba {
 		}
 
 	void Interpolation::interpolationTransition() {
+    if (p_resetn == false) {
+      prevprevx = prevx = prevprevy = prevy = x = y = 0;
+    }
     prevprevx = prevx;
     prevprevy = prevy;
     prevx=x;
