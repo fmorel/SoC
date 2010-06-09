@@ -15,22 +15,23 @@ namespace soclib { namespace caba {
 		}
 
 	void Interpolation::interpolationTransition() {
-    int Ex,Ey;
-    Ex = (int)x;
-    Ey = (int)y;
-    buffer_command[0] = Ex; 
-    buffer_command[1] = Ey; 
+    x=p_x.read();
+    y=p_y.read();
+    for(int i=0;i<4;i++)
+      intensities[i]=p_buffer_in[i].read();
   }
 
 	void Interpolation::interpolationMoore() {
     int Ex,Ey;
-    Ex = (int)x;
-    Ey = (int)y;
-    int dx,dy;
+    Ex=(int)x;
+    Ey=(int)y;
+    float dx,dy;
     dx = x -Ex;
     dy = y- Ey;
-    int temp = (1-dx)*(1-dy)*buffer_in[0] + (1-dx) * dy * buffer_in[1] + dx * ( 1 - dy ) * buffer_in[2] + dx * dy * buffer_in[3];
-    out = temp;
+    int temp = (1-dx)*(1-dy)*intensities[0] + (1-dx) * dy * intensities[1] + dx * ( 1 - dy ) * intensities[2] + dx * dy * intensities[3];
+    p_out = temp;
+    p_buffer_command[0] = Ex; 
+    p_buffer_command[1] = Ey; 
   }
 }}
 

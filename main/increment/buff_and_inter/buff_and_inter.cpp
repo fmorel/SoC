@@ -48,16 +48,16 @@ namespace soclib {
       buffer.p_resetn(p_resetn);
       interpolation.p_clk(p_clk);
       interpolation.p_resetn(p_resetn);
-      interpolation.x(signal_x);
-      interpolation.y(signal_y);
-      interpolation.out(signal_intensity);
+      interpolation.p_x(signal_x);
+      interpolation.p_y(signal_y);
+      interpolation.p_out(signal_intensity);
       int i;
       for(i = 0;i<2;i++){
         buffer.buffer_command_out[i](signal_buffer_command[i]);
-        interpolation.buffer_command[i](signal_buffer_command[i]);
+        interpolation.p_buffer_command[i](signal_buffer_command[i]);
       }
       for(i = 0;i<4;i++){
-        interpolation.buffer_in[i](signal_buffer_out[i]);
+        interpolation.p_buffer_in[i](signal_buffer_out[i]);
         buffer.buffer_out[i](signal_buffer_out[i]);
       }
 
