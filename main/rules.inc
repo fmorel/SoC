@@ -1,4 +1,7 @@
 
+test_self: $(TEST_BINARY)
+	-./$(TEST_BINARY)  >&/dev/null
+
 $(SIM_BINARY): $(PLATFORM_DESC)
 	$(SOCLIB_CC) -P -p $(PLATFORM_DESC) $(SOCLIB_CC_ARGS) $(SOCLIB_CC_ADD_ARGS) -o $@
 $(TEST_BINARY):
@@ -13,6 +16,4 @@ clean: soft_clean
 test: test_submodules test_self 
 test_submodules:
 	-@for submodule in $(SUBMODULES); do $(MAKE) -C $$submodule test; done
-test_self: $(TEST_BINARY)
-	-./$(TEST_BINARY)  >&/dev/null
 
