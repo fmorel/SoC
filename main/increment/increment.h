@@ -16,7 +16,6 @@ namespace soclib { namespace caba {
 
         class Increment: public sc_core::sc_module{
 	    private:
-		soclib::caba::MinIncr <wb_param>    min_incr;
 		soclib::caba::BufInter <wb_param>   buff_and_inter;
 		sc_signal<bool> signal_new_tile;
 		sc_signal<bool> signal_ask;
@@ -26,10 +25,13 @@ namespace soclib { namespace caba {
 		sc_signal<float> signal_x_min;
 		sc_signal<float> signal_y;
 		sc_signal<float> signal_y_min;
+		sc_signal<int> signal_min_incr_debug_state;
+		sc_signal<int> signal_min_incr_debug_signal;
 
 	    protected:
 		SC_HAS_PROCESS(Increment);
 	    public:
+		soclib::caba::MinIncr <wb_param>    min_incr;
 		sc_core::sc_in<bool>              p_clk;
 		sc_core::sc_in<bool>              p_resetn;
 
@@ -41,6 +43,8 @@ namespace soclib { namespace caba {
 		/*DEBUG*/	    sc_core::sc_out<float>	x_min_display;
 		/*DEBUG*/	    sc_core::sc_out<float>	y_display;
 		/*DEBUG*/	    sc_core::sc_out<float>	y_min_display;
+		/*DEBUG*/	    sc_core::sc_out<int>	min_incr_debug_signal;
+		/*DEBUG*/	    sc_core::sc_out<int>	min_incr_debug_state;
 
 		//wishbone interface
 		WbMaster <wb_param>		  p_wb_master;

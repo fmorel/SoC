@@ -16,20 +16,19 @@ namespace soclib { namespace caba {
 	class BufInter: public sc_core::sc_module{
 	    private:
 		soclib::caba::Buffer buffer;
-		   soclib::caba::Interpolation interpolation;
+		soclib::caba::Interpolation interpolation;
 		enum BufInterStates {
-		    UNDEFINED,
-		    IDLE,
 		    LOADING,
-		    INTERPOLING
+		    INTERPOLING,
+		    IDLE
 		};
 		sc_signal<bool> signal_write_enable;
 		sc_signal<uint32_t> signal_buffer_in;
 		sc_signal<float> signal_x_min;
 		sc_signal<float> signal_y_min;
-    sc_signal<int>   signal_buffer_command[2];
-    sc_signal<unsigned char>   signal_buffer_out[4];
-    sc_signal<unsigned char>  signal_intensity;
+		sc_signal<int>   signal_buffer_command[2];
+		sc_signal<unsigned char>   signal_buffer_out[4];
+		sc_signal<unsigned char>  signal_intensity;
 		int state;
 		int next_state;
 	    protected:

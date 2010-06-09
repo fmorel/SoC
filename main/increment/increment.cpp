@@ -37,6 +37,8 @@ namespace soclib { namespace caba {
 	    min_incr.x_min		(signal_x_min);
 	    min_incr.y			(signal_y);
 	    min_incr.y_min		(signal_y_min);
+	    min_incr.debug_state		(signal_min_incr_debug_state);
+	    min_incr.debug_signal		(signal_min_incr_debug_signal);
 
 	    //Connection of buff_and_inter entries
 	    buff_and_inter.p_clk	(p_clk);
@@ -58,14 +60,16 @@ namespace soclib { namespace caba {
 	void Increment<wb_param>::incrementTransition() {
 	    //new_tile_display=signal_new_tile;
 	    //ask_for_x_y_display=signal_ask;
-      /*DEBUG*/	x_display = signal_x;
-	    /*DEBUG*/	x_min_display = signal_x_min;
-	    /*DEBUG*/	y_display = signal_y;
-	    /*DEBUG*/	y_min_display = signal_y_min;
-	    /*DEBUG*/	ask_for_x_y_display = signal_ask;
-	    /*DEBUG*/	new_tile_display = signal_new_tile;
-	    /*DEBUG*/	intensity_display	 = signal_intensity;
-	    /*DEBUG*/	valid_display	 = signal_valid;
+	    /*DEBUG*/	x_display = signal_x;
+	    /*DEBUG*/	x_min_display		    = signal_x_min;
+	    /*DEBUG*/	y_display		    = signal_y;
+	    /*DEBUG*/	y_min_display		    = signal_y_min;
+	    /*DEBUG*/	ask_for_x_y_display	    = signal_ask;
+	    /*DEBUG*/	new_tile_display	    = signal_new_tile;
+	    /*DEBUG*/	intensity_display	    = signal_intensity;
+	    /*DEBUG*/	valid_display		    = signal_valid;
+	    /*DEBUG*/	min_incr_debug_signal	    = signal_min_incr_debug_signal;
+	    /*DEBUG*/	min_incr_debug_state	    = signal_min_incr_debug_state;
 
 
 	}
