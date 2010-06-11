@@ -1,0 +1,8 @@
+# -*- python -*-
+
+todo = Platform('caba', 'testbench.cpp',
+        uses = [
+				Uses('caba:single_buffer'),
+        ],
+        )
+

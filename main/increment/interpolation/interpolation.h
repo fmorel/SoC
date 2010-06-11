@@ -6,27 +6,29 @@
 
 namespace soclib { namespace caba {
 
-        class Interpolation: public sc_core::sc_module{
-            private:
-						protected:
-                SC_HAS_PROCESS(Interpolation);
-            public:
-                sc_core::sc_in<bool>              p_clk;
-                sc_core::sc_in<bool>              p_resetn;
+  class Interpolation: public sc_core::sc_module{
+    private:
+      float x,y,prevx,prevy,prevprevx,prevprevy;
+      unsigned char  intensities[4];
+    protected:
+      SC_HAS_PROCESS(Interpolation);
+    public:
+      sc_core::sc_in<bool>              p_clk;
+      sc_core::sc_in<bool>              p_resetn;
 
-                sc_core::sc_in<float>             x;
-                sc_core::sc_in<float>             y;
+      sc_core::sc_in<float>             p_x;
+      sc_core::sc_in<float>             p_y;
 
-                sc_core::sc_out<unsigned char>    out;
+      sc_core::sc_out<unsigned char>    p_out;
 
-                sc_core::sc_in<unsigned char>     buffer_in[4];
-                sc_core::sc_out<uint32_t>              buffer_command[2];
-                // constructor
-                Interpolation (sc_core::sc_module_name insname);
+      sc_core::sc_in<unsigned char>     p_buffer_in[4];
+      sc_core::sc_out<int>              p_buffer_command[2];
+      // constructor
+      Interpolation (sc_core::sc_module_name insname);
 
-								void interpolationTransition();
-								void interpolationMoore();
-        };
+      void interpolationTransition();
+      void interpolationMoore();
+  };
 
 }}
 #endif

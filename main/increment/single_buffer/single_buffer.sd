@@ -1,0 +1,13 @@
+Module('caba:single_buffer',
+        classname = 'soclib::caba::SingleBuffer',
+        header_files = ['single_buffer.h',],
+        implementation_files = ['single_buffer.cpp',],
+        ports = [
+            Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+            Port('caba:clock_in', 'p_clk', auto = 'clock'),
+        ],
+        uses = [
+        ],
+        debug = True ,
+      )
+
