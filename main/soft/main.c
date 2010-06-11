@@ -45,6 +45,8 @@ int overwriting;
 volatile int difference;
 volatile uint32_t last_processed_image;
 image_t images[IMAGES_NUMBER] = { { { 0 } } };
+image_coeffs_t image_coeffs;
+
 
 void video_in_handler() {
   //Give video_in an address.

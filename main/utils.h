@@ -13,7 +13,29 @@
 //#define WIDTH 128
 //#define HEIGHT 128
 #define REAL_WIDTH WIDTH/4
+
+// tile size
+#define TILE_SIZE 16
+#define ANTE_TILE_SIZE 32
+
 typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
+
+typedef struct incr_coeffs_t {
+  uint32_t P0;
+  uint32_t Q0;
+  uint32_t Q1;
+  uint32_t Q2;
+  uint32_t Q3;
+  uint32_t R0;
+  uint32_t R1;
+  uint32_t R2;
+  uint32_t S0;
+  uint32_t S1;
+} incr_coeffs_t ;
+typedef incr_coeffs_t image_coeffs_t[TILE_SIZE][TILE_SIZE] ;
+
+
+
 
 // Sync
 #define TARGET_FPS 			60
@@ -29,9 +51,4 @@ typedef uint32_t image_t[HEIGHT][REAL_WIDTH] ;
 
 // video_in
 #define VIDEO_IN_BUFSIZE 4
-
-// tile size
-#define TILE_SIZE 16
-#define ANTE_TILE_SIZE 32
-
 #endif
