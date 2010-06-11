@@ -43,7 +43,6 @@ volatile unsigned int video_in_index;
 volatile unsigned int processing_index;
 int overwriting;
 volatile int difference;
-volatile uint32_t last_processed_image;
 image_t images[IMAGES_NUMBER] = { { { 0 } } };
 image_coeffs_t image_coeffs;
 
@@ -59,12 +58,6 @@ void video_in_handler() {
 	}
 }
 
-void video_out_handler() {
-  //Tell video_out
-  VIDEO_OUT = last_processed_image;
-}
-
-
 void video_processing_task() {
   for(;;) {
 		//Wait until :
@@ -75,9 +68,9 @@ void video_processing_task() {
     uint32_t image_address = (uint32_t)&images[processing_index%IMAGES_NUMBER];
     my_printf("Processing image : %x\n\r",image_address);
     vProcessImage(*((image_t *)image_address));
+    VIDEO_OUT = image_address;
     my_printf("Processed image : %x\n\r",image_address);
     processing_index++;
-    last_processed_image = image_address;
   }
 }
 
@@ -85,18 +78,15 @@ int main(void) {
 
   irq_enable();
 
-  RegisterIrqEntry(1, &video_out_handler);
   RegisterIrqEntry(2, &video_in_handler);
 
   processing_index = 0;
   video_in_index = 1;
 	overwriting = 0;
-  last_processed_image = (uint32_t)&images[IMAGES_NUMBER-1];
 
   //Initialize VIDEO_IN
   VIDEO_IN  = (uint32_t)&images[0] ;
-  //Initialize VIDEO_OUT
-  VIDEO_OUT = last_processed_image ;
+
   video_processing_task();
 
   getchar();

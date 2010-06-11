@@ -61,10 +61,10 @@ namespace soclib { namespace caba {
 				case SLAVE_REQ:
 					p_wb_slave.ACK_O=1;
 					if (p_wb_slave.WE_I) {
-						address=p_wb_slave.DAT_I.read();
-            std::cout << "Video_OUT : Got address " << address << std::endl;
+						base_address=p_wb_slave.DAT_I.read();
+            std::cout << "Video_OUT : Got address " << base_address << std::endl;
           }
-					p_wb_slave.DAT_O=address;
+					p_wb_slave.DAT_O=base_address;
 			}
 		}
 
@@ -80,21 +80,13 @@ namespace soclib { namespace caba {
 				// add initialiszations
 				std::cout << name() << " Reset..."<<std::endl;
 				address=0;
+				base_address=0;
 				writingLine=0;
-				masterState=MASTER_IDLE;
+				masterState=MASTER_BEGINLINE;
 				return;
 			}
 			switch (masterState) {
 
-				//waits for address to be set
-				case MASTER_IDLE:
-					// if address is not null
-					if (address) {
-						masterState=MASTER_BEGINLINE;
-						writingLine=0;
-					}
-					break;
-				
 				//perform the initialization of a new line and checks to not overwrite buffered line
 				case MASTER_BEGINLINE:
 					if (writingLine < (outputLine+BUFLINE)) {
@@ -141,8 +133,9 @@ namespace soclib { namespace caba {
 				
 				//send an interrut and reset the address register when transmission has ended
 				case MASTER_ENDOFTRANS:
-					masterState=MASTER_IDLE;
-					address=0;
+					masterState=MASTER_BEGINLINE;
+					address=base_address;
+          writingLine = 0;
 				}
 			}
 
@@ -151,10 +144,6 @@ namespace soclib { namespace caba {
 		void VideoOut<wb_param>::masterMoore() {
 			// on the falling edge of clk
 			switch (masterState) {
-				case MASTER_IDLE:
-					p_wb_master.STB_O=0;
-					p_wb_master.CYC_O=0;
-					break;
 				case MASTER_TRANS:
 					p_wb_master.STB_O=1;
 					p_wb_master.CYC_O=1;
@@ -228,14 +217,14 @@ namespace soclib { namespace caba {
 				cycle_count++;
 				if (cycle_count==2) {
 					nextOutputState=OUTPUT_WAITFRAME2;
-                    p_interrupt=1;
+                    //p_interrupt=1;
                     outputLine=0;
 				}
                 break;
 
             case OUTPUT_WAITFRAME2:
                 cycle_count++;
-                p_interrupt=0;
+                //p_interrupt=0;
                 if (cycle_count == FRAME_SYNC) 
                     nextOutputState=OUTPUT_IDLE;
                 

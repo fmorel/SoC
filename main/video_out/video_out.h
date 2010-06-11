@@ -10,7 +10,6 @@
 #include "utils.h"
 
 //state of the master FSM
-#define MASTER_IDLE 0
 #define MASTER_BEGINLINE 1
 #define MASTER_TRANS 2
 #define MASTER_TRANSPAUSE 5
@@ -46,6 +45,7 @@ namespace soclib { namespace caba {
 							int outputState,nextOutputState;
 							int cycle_count;
 							uint64_t address;
+							uint64_t base_address;
 							unsigned char lineBuffer[BUFLINE][WIDTH];
 							
 							int writingLine, writingWord;
