@@ -16,3 +16,4 @@
 //tile size
 #define TILE_SIZE 16
 #define ANTE_TILE_SIZE 32
+#define NB_TILES (WIDTH*HEIGHT)/(TILE_SIZE*TILE_SIZE)

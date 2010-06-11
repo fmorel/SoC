@@ -317,7 +317,8 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_valid_display ,"valid");
     sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
     sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
-    sc_trace (TRACEFILE, signal_minincr_slave ,"wb_slave");
+    sc_trace (TRACEFILE, signal_minincr_master ,"minincr_master");
+    sc_trace (TRACEFILE, signal_buffer_master, "master_buffer");
 
 #endif
 

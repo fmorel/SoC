@@ -105,8 +105,8 @@ namespace soclib {
     template <typename wb_param> \
       void BufInter<wb_param>::BufInterTransition() {
         if (p_resetn == false ) {
-          next_state=WB_LOADING_START;
-          state=WB_LOADING_START;
+          next_state=NEW_TILE;
+          state=NEW_TILE;
           return;
         }
 

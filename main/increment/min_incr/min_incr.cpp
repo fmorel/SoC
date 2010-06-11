@@ -16,6 +16,13 @@ namespace soclib {
         ,unvalid(true)
     {
 
+      SC_METHOD(slaveTransition);
+      dont_initialize();
+      sensitive<<p_clk.pos();
+      SC_METHOD(slaveMoore);
+      dont_initialize();
+      sensitive<<p_clk.neg();
+
       SC_METHOD(MinIncrTransition);
       dont_initialize();
       sensitive<<p_clk.pos();
@@ -181,9 +188,8 @@ namespace soclib {
 
 
           case INIT_INCR_MIN:
-            debug_state = 2;
-            for(i = 0;i<20;i++){
-              signal_x_y_min[i]=registered_poly[0][i];
+            for(int j = 0;j<20;j++){
+              signal_x_y_min[j]=registered_poly[0][j];
             }
             signal_y_min_mux=true;
             signal_x_min_mux=true;
@@ -200,9 +206,8 @@ namespace soclib {
 
           case INIT_INCR:
             tile_ready=false;
-            debug_state= 3;
-            for(i = 1;i<20;i++){
-              signal_x_y[i]=registered_poly[0][i];
+            for(int j = 0;j<20;j++){
+              signal_x_y[j]=registered_poly[0][j];
             }
             signal_y_mux=true;
             signal_x_mux=true;
@@ -222,14 +227,21 @@ namespace soclib {
                 state=WAIT_CONFIG;
                 return;
               }
+
             switch(state) {
               case WAIT_CONFIG:
-                if (base_address)
+                if (base_address) {
+                 std::cout << "base address is  " << base_address << std::endl;
                   next_state=WB_LOADING_START;
+                }
+                break;
 
               case WB_LOADING_START:
                 i=0;
-                address=base_address+nb_tiles*20*4;
+                //for a complete image
+                //address=base_address+nb_tiles*20*4;
+                //for bullshit
+                address=base_address;
                 next_state=WB_LOADING_WAIT;
                 break;
 
@@ -272,9 +284,10 @@ namespace soclib {
               case WAIT_COMPUTE_MIN:
                 i++;
                 //TODO : tuning
-                if (i==257)
+                if (i==257 ) {
                   next_state=WAIT_X_Y;
-                i=0;
+                  i=0;
+                }
                 break;
 
               case WAIT_X_Y:
@@ -296,11 +309,12 @@ namespace soclib {
                 if (i==257) {
                   nb_tiles++;
                   next_state=WAIT_CONFIG;
+                  i=0;
                 }
-                i=0;
                 break;
             }
             state=next_state;
+            debug_state=state;
           }
       }
   }
