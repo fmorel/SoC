@@ -84,6 +84,9 @@ int main(void) {
   video_in_index = 0;
   VIDEO_IN  = (uint32_t)&images[0] ;
 
+  //Initialize VIDEO_OUT
+  VIDEO_OUT = (uint32_t)&images[IMAGES_NUMBER-1];
+
   video_processing_task();
 
   getchar();
