@@ -26,7 +26,6 @@ namespace soclib { namespace caba {
           //states of the wb_master
           WB_LOADING_START,
           WB_LOADING_WAIT,
-          WB_LOADING_WRITE,
           WB_LOADING_ENDLINE,
           WB_LOADING_END,
           //states of the interpolator
@@ -46,6 +45,7 @@ namespace soclib { namespace caba {
         //used by the wb master
         int state;
         int next_state;
+        bool isWriting;
         uint32_t x_min_integer,y_min_integer;
         int loading_line,loading_word;
         uint32_t incoming_data;

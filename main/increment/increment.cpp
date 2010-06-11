@@ -57,6 +57,18 @@ namespace soclib { namespace caba {
 	    buff_and_inter.p_wb_master	(p_buffer_master);
 	    buff_and_inter.p_wb_slave	(p_buffer_slave);
 
+
+     //outputtile module
+      output_tile.p_clk(p_clk);
+      output_tile.p_resetn(p_resetn);
+      output_tile.p_intensity(signal_intensity);
+      output_tile.p_valid(signal_valid);
+      
+      output_tile.p_wb_master(p_output_master);
+      output_tile.p_wb_slave(p_output_slave);
+
+
+
 	}
 
     template <typename wb_param> \

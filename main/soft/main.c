@@ -31,24 +31,20 @@
 #include "lm32_irq.h"
 #include "segmentation.h"
 #include "my_printf.h"
+#include "utils.h"
 
-#define VIDEO_OUT *((volatile unsigned int *)VIDEO_OUT_BASE)
 
-//in word (4 bytes)
-#define WIDTH 160
-#define HEIGHT 480
-#define MODULO 16
 
 const static int a[4][4] =
 { { 0  ,0  ,0  ,0  ,} ,
-  { 17,0  ,0  ,0 } ,
+  { 1,0  ,0  ,0 } ,
   { 0  ,0  ,0  ,0 } ,
   { 0  ,0  ,0  ,0 } } ;
 
 const static int b[4][4] =
 { { 0  ,0  ,0  ,0  ,} ,
   { 0  ,0  ,0  ,0 } ,
-  { 0  ,13 ,0  ,0 } ,
+  { 0  ,1 ,0  ,0 } ,
   { 0  ,0  ,0  ,0 } } ;
 
 
@@ -76,6 +72,7 @@ int main(void) {
   const int b_b00 = b[3][0] + b[2][0] + b[1][0];
   int time[11];
   int i;
+  int line,col;
   int X=0;
   int Y=0;
   int X_2;
@@ -84,14 +81,20 @@ int main(void) {
   int b_P1,b_P2,b_P3,b_P0,b_Q0,b_Q1,b_Q2,b_R0,b_R1,b_R2,b_S0,b_S1;
   
   
-  int dataPoly[128];
+  int dataPoly[NB_TILES*20];
 
-
-  for(i=0;i<5;i++) {
-    X=16*i+32;
+  line=0;col=0;
+  my_printf(" Processoooorr begin to compuuuute !\r\n");
+  for(i=0;i<NB_TILES;i++) {
+    X=16*col;
     X_2 = X*X;
-    Y=0+32;
+    Y=16*line;
     Y_2 = Y*Y;
+    if (col == WIDTH/TILE_SIZE) {
+      line++;
+      col=0;
+      my_printf("Line ended !! \r\n");
+     }
     //P1(X,Y) and S1(X0,Y0)
     a_P1 = a_c10 * X + a_c01 * Y + a_c00;
     //P2(X,Y) and R2(X0,Y0)
@@ -148,38 +151,33 @@ int main(void) {
     b_S0 = 2* b[2][1] ;
     b_S1 = b_P1;
 
-    my_printf("Hello world !\n\r");
 
 
 
-    dataPoly[i*20+0] = a_P0;
-    dataPoly[i*20+1] = a_P1;
-    dataPoly[i*20+2] = a_P2;
-    dataPoly[i*20+3] = a_P3;
-    dataPoly[i*20+4] = a_Q0;
-    dataPoly[i*20+5] = a_Q1;
-    dataPoly[i*20+6] = a_Q2;
-    dataPoly[i*20+7] = a_R0;
-    dataPoly[i*20+8] = a_R1;
-    dataPoly[i*20+9] = a_R2;
-    dataPoly[i*20+10] = a_S0;
-    dataPoly[i*20+11] = a_S1;
-    dataPoly[i*20+12] = b_P0;
-    dataPoly[i*20+13] = b_P1;
-    dataPoly[i*20+14] = b_P2;
-    dataPoly[i*20+15] = b_P3;
-    dataPoly[i*20+16] = b_Q0;
-    dataPoly[i*20+17] = b_Q1;
-    dataPoly[i*20+18] = b_Q2;
-    dataPoly[i*20+19] = b_R0;
-    dataPoly[i*20+20] = b_R1;
-    dataPoly[i*20+21] = b_R2;
-    dataPoly[i*20+22] = b_S0;
-    dataPoly[i*20+23] = b_S1;
+    dataPoly[i*20+0] = a_Q0;
+    dataPoly[i*20+1] = a_Q1;
+    dataPoly[i*20+2] = a_Q2;
+    dataPoly[i*20+3] = a_Q3;
+    dataPoly[i*20+4] = a_R0;
+    dataPoly[i*20+5] = a_R1;
+    dataPoly[i*20+6] = a_R2;
+    dataPoly[i*20+7] = a_S0;
+    dataPoly[i*20+8] = a_S1;
+    dataPoly[i*20+9] = a_P0;
+    
+    dataPoly[i*20+10] = a_Q0;
+    dataPoly[i*20+11] = a_Q1;
+    dataPoly[i*20+12] = a_Q2;
+    dataPoly[i*20+13] = a_Q3;
+    dataPoly[i*20+14] = a_R0;
+    dataPoly[i*20+15] = a_R1;
+    dataPoly[i*20+16] = a_R2;
+    dataPoly[i*20+17] = a_S0;
+    dataPoly[i*20+18] = a_S1;
+    dataPoly[i*20+19] = a_P0;
 
     *((volatile unsigned int *) INCREMENT_BASE ) = dataPoly;
 
-    my_printf("polynoms set ;-)\r\n");
  }
  getchar();
   return 0;

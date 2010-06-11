@@ -81,6 +81,7 @@ int _main(int argc, char *argv[])
     //add simple slave
     maptab.add(Segment("minincr", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), false));
     maptab.add(Segment("buffer", BUFFER_BASE, BUFFER_SIZE, IntTab(4), false));
+    maptab.add(Segment("output", OUTPUT_BASE, OUTPUT_SIZE, IntTab(5), false));
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
@@ -110,9 +111,11 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_minincr_master("signal_minincr_master");
     soclib::caba::WbSignal<wb_param> signal_minincr_slave("signal_minincr_slave");
     
-    
     soclib::caba::WbSignal<wb_param> signal_buffer_master("signal_buffer_master");
     soclib::caba::WbSignal<wb_param> signal_buffer_slave("signal_buffer_slave");
+
+    soclib::caba::WbSignal<wb_param> signal_output_master("signal_output_master");
+    soclib::caba::WbSignal<wb_param> signal_output_slave("signal_output_slave");
 
     /*DEBUG*/    // Increment Signals
     /*DEBUG*/    sc_signal<float>	signal_x_display;
@@ -167,7 +170,7 @@ int _main(int argc, char *argv[])
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 3,5);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 4,6);
 
     //VideoGen
     //soclib::caba::VideoGen my_videogen ("video_gen");
@@ -197,6 +200,10 @@ int _main(int argc, char *argv[])
 
     increment.p_minincr_master(signal_minincr_master);
     increment.p_minincr_slave(signal_minincr_slave);
+
+
+    increment.p_output_master(signal_output_master);
+    increment.p_output_slave(signal_output_slave);
 
 
     /*DEBUG*/	    increment.x_display(signal_x_display);
@@ -259,11 +266,13 @@ int _main(int argc, char *argv[])
     wbinterco.p_from_master[0](signal_wb_lm32);
     wbinterco.p_from_master[1](signal_minincr_master);
     wbinterco.p_from_master[2](signal_buffer_master);
+    wbinterco.p_from_master[3](signal_output_master);
     wbinterco.p_to_slave[0](signal_wb_rom);
     wbinterco.p_to_slave[1](signal_wb_ram);
     wbinterco.p_to_slave[2](signal_wb_tty);
     wbinterco.p_to_slave[3](signal_minincr_slave);
     wbinterco.p_to_slave[4](signal_buffer_slave);
+    wbinterco.p_to_slave[5](signal_output_slave);
     // lm32
     lm32.p_clk(signal_clk);
     lm32.p_resetn(signal_resetn);
@@ -306,7 +315,7 @@ int _main(int argc, char *argv[])
     sc_trace_file *TRACEFILE;
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
     //sc_trace (TRACEFILE, signal_resetn, "resetn" );
-//    sc_trace (TRACEFILE, signal_clk,    "clk"    );
+    //sc_trace (TRACEFILE, signal_clk,    "clk"    );
     sc_trace (TRACEFILE, signal_x_display ,"x");
     sc_trace (TRACEFILE, signal_x_min_display ,"x_min");
     sc_trace (TRACEFILE, signal_y_display ,"y");
@@ -319,7 +328,8 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
     sc_trace (TRACEFILE, signal_minincr_master ,"minincr_master");
     sc_trace (TRACEFILE, signal_buffer_master, "master_buffer");
-
+    sc_trace (TRACEFILE, signal_output_master, "master_output");
+    
 #endif
 
     ////////////////////////////////////////////////////////////
@@ -352,14 +362,14 @@ int _main(int argc, char *argv[])
 // fake sc_man to catch exceptions
 int sc_main(int argc, char *argv[])
 {
-    try {
-	return _main(argc, argv);
-    } catch (std::exception &e) {
-	std::cout << e.what() << std::endl;
-    } catch (...) {
-	std::cout << "Unknown exception occured" << std::endl;
-	throw;
-    }
-    return 1;
+  try {
+    return _main(argc, argv);
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+  } catch (...) {
+    std::cout << "Unknown exception occured" << std::endl;
+    throw;
+  }
+  return 1;
 }
 

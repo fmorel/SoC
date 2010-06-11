@@ -308,6 +308,8 @@ namespace soclib {
                 //TODO : tuning
                 if (i==257) {
                   nb_tiles++;
+                  if (nb_tiles == NB_TILES)
+                    address=base_address;
                   next_state=WAIT_CONFIG;
                   i=0;
                 }

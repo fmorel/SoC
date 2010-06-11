@@ -15,6 +15,7 @@ Module('caba:increment',
         Uses('caba:wishbone'),
         Uses('caba:min_incr'),
         Uses('caba:buff_and_inter'),
+        Uses('caba:output_tile'),
         ],
         debug = True ,
       )

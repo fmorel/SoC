@@ -122,32 +122,32 @@ namespace soclib {
             loading_word=0;
             loading_line=0;
             address=base_address+x_min_integer+WIDTH*y_min_integer;
+            isWriting=0;
             next_state=WB_LOADING_WAIT;
             break;
 
           case WB_LOADING_WAIT:
             if (p_wb_master.ACK_I) {
               incoming_data=p_wb_master.DAT_I.read();
-              next_state=WB_LOADING_WRITE;
-            }
-            break;
-
-          case WB_LOADING_WRITE:
-            loading_word++;
-            address+=4;
-            //end of a 32-pixel line
-            if (loading_word==8) {
-              loading_word=0;
-              address-=32;
-              loading_line++;
-              address+=WIDTH;
-              if (loading_line==32)
-                next_state=WB_LOADING_END;
+              loading_word++;
+              address+=4;
+              isWriting=1;
+              //end of a 32-pixel line
+              if (loading_word==8) {
+                loading_word=0;
+                address-=32;
+                loading_line++;
+                address+=WIDTH;
+                if (loading_line==32)
+                  next_state=WB_LOADING_END;
+                else
+                  next_state=WB_LOADING_ENDLINE;
+              }
               else
-                next_state=WB_LOADING_ENDLINE;
+                next_state=WB_LOADING_WAIT;
             }
             else
-              next_state=WB_LOADING_WAIT;
+                isWriting=0;
             break;
 
           case WB_LOADING_ENDLINE:
@@ -205,13 +205,10 @@ namespace soclib {
             p_wb_master.STB_O=1;
             p_wb_master.WE_O=0;
             p_wb_master.ADR_O=address;
-            signal_write_enable=0;
+            signal_write_enable=isWriting;
+            signal_buffer_in=incoming_data;
             break;
 
-          case WB_LOADING_WRITE:
-            signal_buffer_in=incoming_data;
-            signal_write_enable=1;
-            break;
 
           case WB_LOADING_ENDLINE:
             p_wb_master.CYC_O=0;

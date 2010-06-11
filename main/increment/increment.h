@@ -17,6 +17,7 @@ namespace soclib { namespace caba {
         class Increment: public sc_core::sc_module{
 	    private:
 		soclib::caba::BufInter <wb_param>   buff_and_inter;
+    soclib::caba::OutputTile <wb_param> output_tile;
 		sc_signal<bool> signal_new_tile;
 		sc_signal<bool> signal_ask;
 		sc_signal<unsigned char> signal_intensity;
@@ -52,6 +53,10 @@ namespace soclib { namespace caba {
 
     WbMaster <wb_param> p_minincr_master;
     WbSlave <wb_param> p_minincr_slave;
+
+    WbMaster <wb_param> p_output_master;
+    WbSlave <wb_param> p_output_slave;
+
 		// constructor
 		Increment (sc_core::sc_module_name insname);
 
