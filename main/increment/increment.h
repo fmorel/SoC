@@ -11,8 +11,8 @@
 #include "interpolation.h"
 #include "buffer.h"
 
-#define N_COEFF 20
-#define COEFF_TYPE int32_t
+#define N_COEFFS 10
+#define COEFF_TYPE float
 
 namespace soclib { namespace caba {
 
@@ -21,9 +21,15 @@ namespace soclib { namespace caba {
         private:
             soclib::caba::IncrementHard incHardX;
             soclib::caba::IncrementHard incHardY;
+//            sc_signal<COEFF_TYPE> XQ0, XQ1, XQ2, XQ3, XR0, XR1, XR2, XS0, XS1, XP3, XP2, XP1, XP0;
+//            sc_signal<COEFF_TYPE> YQ0, YQ1, YQ2, YQ3, YR0, YR1, YR2, YS0, YS1, YP3, YP2, YP1, YP0;
+            sc_signal<COEFF_TYPE> XYcoeffs[2 * N_COEFFS];
+            sc_signal<bool> Xswitch, Yswitch;
+
 //            soclib::caba::Interpolation interpolation;
 //            soclib::caba::Buffer buffer;
-            sc_signal<float> dummy_float,dummy_float1;
+
+            sc_signal<COEFF_TYPE> dummy_float,dummy_float1;
             sc_signal<bool> dummy_bool;
             sc_signal<unsigned char> dummy_uchar[4];
             sc_signal<uint32_t> dummy_uint32;
@@ -32,6 +38,7 @@ namespace soclib { namespace caba {
 
             int32_t     slave_state, master_state;
             uint32_t    coeff_address_start, coeff_address_current;
+            int32_t     coeff_count;
 
         protected:
             SC_HAS_PROCESS(Increment);
@@ -51,10 +58,15 @@ namespace soclib { namespace caba {
             void masterMoore();
 
             enum states {
-                IDLE,
                 WAIT_CONFIG,
-                ACK_AND_LOAD_COEFF,
+                ACK_AND_BUSY,
+                BUSY,
+
+                IDLE,
+                START_LOADING_COEFF,
                 LOAD_COEFF,
+                DONE_LOADING_COEFF,
+
                 COMPUTE_MIN,
                 INCR
             };

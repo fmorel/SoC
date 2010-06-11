@@ -36,6 +36,7 @@
 
 #define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
 #define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
+#define INCREMENT   *((volatile unsigned int *)INCREMENT_BASE)
 
 #define IMAGES_NUMBER 8
 
@@ -81,23 +82,31 @@ void video_processing_task() {
 
 int main(void) {
 
-  irq_enable();
+//  irq_enable();
+//
+//  RegisterIrqEntry(1, &video_out_handler);
+//  RegisterIrqEntry(2, &video_in_handler);
+//
+//  processing_index = 0;
+//  video_in_index = 1;
+//	overwriting = 0;
+//  last_processed_image = (uint32_t)&images[IMAGES_NUMBER-1];
+//
+//  //Initialize VIDEO_IN
+//  VIDEO_IN  = (uint32_t)&images[0] ;
+//  //Initialize VIDEO_OUT
+//  VIDEO_OUT = last_processed_image ;
+//  video_processing_task();
 
-  RegisterIrqEntry(1, &video_out_handler);
-  RegisterIrqEntry(2, &video_in_handler);
+    int i;
+    uint32_t tab[20];
+    for(i = 0; i < 20; i++) {
+        tab[i] = 20 - i;
+    }
 
-  processing_index = 0;
-  video_in_index = 1;
-	overwriting = 0;
-  last_processed_image = (uint32_t)&images[IMAGES_NUMBER-1];
+    INCREMENT = tab;
 
-  //Initialize VIDEO_IN
-  VIDEO_IN  = (uint32_t)&images[0] ;
-  //Initialize VIDEO_OUT
-  VIDEO_OUT = last_processed_image ;
-  video_processing_task();
-
-  getchar();
-  return 0;
+    getchar();
+    return 0;
 }
 

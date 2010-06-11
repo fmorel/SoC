@@ -60,6 +60,8 @@
 #include "increment.h"
 
 
+#define DO_TRACES 1
+
 // real SystemC main
 int _main(int argc, char *argv[])
 {
@@ -80,10 +82,10 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("rom" , ROM_BASE , ROM_SIZE , IntTab(0), true));
     maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
     maptab.add(Segment("tty"  , TTY_BASE  , TTY_SIZE  , IntTab(2), false));
-    //add simple slave
+    // add simple slave
     maptab.add(Segment("video_out_slave", VIDEO_OUT_BASE, VIDEO_OUT_SIZE, IntTab(3), false));
-        
     maptab.add(Segment("video_in"  , VIDEO_IN_BASE  , VIDEO_IN_SIZE  , IntTab(4), false));
+    maptab.add(Segment("increment"  , INCREMENT_BASE  , INCREMENT_SIZE , IntTab(5), false));
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
@@ -111,28 +113,28 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_wb_tty("signal_wb_tty");
     //WB slave    
     soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
-		//WB master
-		soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
-		
+    //WB master
+    soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
 
-		//WB slave	
+
+    //WB slave	
     soclib::caba::WbSignal<wb_param> signal_increment_slave("signal_increment_slave");
-		//WB master
-		soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
+    //WB master
+    soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
 
 
 
-		//video signals
-		sc_signal<bool> frame_valid_out("frame_valid_out");
-		sc_signal<bool> line_valid_out("line_valid_out");
-		sc_signal<unsigned char> pixel_out("pixel_out");
+    //video signals
+    sc_signal<bool> frame_valid_out("frame_valid_out");
+    sc_signal<bool> line_valid_out("line_valid_out");
+    sc_signal<unsigned char> pixel_out("pixel_out");
 
     soclib::caba::WbSignal<wb_param> signal_wb_video_in_slave("signal_wb_video_in_slave");
     soclib::caba::WbSignal<wb_param> signal_wb_video_in_master("signal_wb_video_in_master");
 
     // irq from uart
     sc_signal<bool> signal_tty_irq("signal_tty_irq");
-    
+
     //irq from video_out
     sc_signal<bool> signal_video_out_irq("video_out_irq");
     //irq from video_in
@@ -166,7 +168,7 @@ int _main(int argc, char *argv[])
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 3,5);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 4, 6);
 
     //VideoGen
     soclib::caba::VideoGen my_videogen ("video_gen");
@@ -188,11 +190,11 @@ int _main(int argc, char *argv[])
     my_display.pixel_in(pixel_out);
 
     //Increment
-		soclib::caba::Increment<wb_param> increment("increment");
-		increment.p_clk (signal_clk);
-		increment.p_resetn (signal_resetn);
-	  increment.p_wb_slave (signal_increment_slave);
-		increment.p_wb_master (signal_increment_master);
+    soclib::caba::Increment<wb_param> increment("increment");
+    increment.p_clk (signal_clk);
+    increment.p_resetn (signal_resetn);
+    increment.p_wb_slave (signal_increment_slave);
+    increment.p_wb_master (signal_increment_master);
 
     ////////////////////////////////////////////////////////////
     /////////////////// WB -> VCI Wrappers /////////////////////
@@ -219,19 +221,19 @@ int _main(int argc, char *argv[])
     tty_w.p_vci               (signal_vci_tty);
     tty_w.p_wb                (signal_wb_tty);
 
-        ////////////////////////////////////////////////////////////
-        ////////////////////// Video_out ////////////////////////////
-        ////////////////////////////////////////////////////////////
-        soclib::caba::VideoOut<wb_param> video_out("video_out");
-        video_out.p_clk (signal_clk);
-        video_out.p_video_clk (signal_video_clk);
-        video_out.p_resetn (signal_resetn);
-        video_out.p_wb_slave (signal_video_out_slave);
-        video_out.p_wb_master (signal_video_out_master);
-        video_out.p_frame_valid (frame_valid_out);
-        video_out.p_line_valid (line_valid_out);
-        video_out.p_pixel_out (pixel_out);
-        video_out.p_interrupt (signal_video_out_irq);
+    ////////////////////////////////////////////////////////////
+    ////////////////////// Video_out ////////////////////////////
+    ////////////////////////////////////////////////////////////
+    soclib::caba::VideoOut<wb_param> video_out("video_out");
+    video_out.p_clk (signal_clk);
+    video_out.p_video_clk (signal_video_clk);
+    video_out.p_resetn (signal_resetn);
+    video_out.p_wb_slave (signal_video_out_slave);
+    video_out.p_wb_master (signal_video_out_master);
+    video_out.p_frame_valid (frame_valid_out);
+    video_out.p_line_valid (line_valid_out);
+    video_out.p_pixel_out (pixel_out);
+    video_out.p_interrupt (signal_video_out_irq);
 
     // video_in
     soclib::caba::VideoIn<wb_param> video_in_w ("video_in_w") ;
@@ -255,11 +257,13 @@ int _main(int argc, char *argv[])
     wbinterco.p_from_master[0](signal_wb_lm32);
     wbinterco.p_from_master[1](signal_video_out_master);
     wbinterco.p_from_master[2](signal_wb_video_in_master);
+    wbinterco.p_from_master[3](signal_increment_master);
     wbinterco.p_to_slave[0](signal_wb_rom);
     wbinterco.p_to_slave[1](signal_wb_ram);
     wbinterco.p_to_slave[2](signal_wb_tty);
     wbinterco.p_to_slave[3](signal_video_out_slave);
     wbinterco.p_to_slave[4](signal_wb_video_in_slave);
+    wbinterco.p_to_slave[5](signal_increment_slave);
 
     // lm32
     lm32.p_clk(signal_clk);
@@ -301,27 +305,30 @@ int _main(int argc, char *argv[])
 #ifdef DO_TRACES
     sc_trace_file *TRACEFILE;
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
-//    sc_trace (TRACEFILE, signal_resetn, "resetn" );
-//    sc_trace (TRACEFILE, signal_clk,    "clk"    );
+    sc_trace (TRACEFILE, signal_resetn, "resetn" );
+    sc_trace (TRACEFILE, signal_clk, "clk");
 //    sc_trace (TRACEFILE, signal_video_clk, "video_clk");
-    sc_trace(TRACEFILE,line_valid ,"line_valid ");
-    sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
-//    sc_trace(TRACEFILE,pixel ,"pixel ");
+//    sc_trace(TRACEFILE,line_valid ,"line_valid ");
+//    sc_trace(TRACEFILE,frame_valid ,"frame_valid ");
+    //    sc_trace(TRACEFILE,pixel ,"pixel ");
     sc_trace (TRACEFILE, signal_wb_lm32,"lm32_wb");
     sc_trace (TRACEFILE, signal_wb_ram, "ram_wb" );
-//    sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
-//    sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
-//    sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
-//    sc_trace (TRACEFILE, signal_video_out_slave, "video_out_slave");
-    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
-//    sc_trace (TRACEFILE, signal_video_out_irq, "video_out_irq" );
-    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
-    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
-//    sc_trace(TRACEFILE,pixel_out,"pixel_out");
-        
-//    sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
-//    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
-//    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
+    //    sc_trace (TRACEFILE, signal_vci_rom,"rom_vci");
+    //    sc_trace (TRACEFILE, signal_wb_rom, "rom_wb" );
+    //    sc_trace (TRACEFILE, signal_wb_tty, "tty_wb" );
+    //    sc_trace (TRACEFILE, signal_video_out_slave, "video_out_slave");
+//    sc_trace (TRACEFILE, signal_video_out_master, "video_out_master");
+    //    sc_trace (TRACEFILE, signal_video_out_irq, "video_out_irq" );
+//    sc_trace(TRACEFILE,line_valid_out,"line_valid_out");
+//    sc_trace(TRACEFILE,frame_valid_out,"frame_valid_out");
+    //    sc_trace(TRACEFILE,pixel_out,"pixel_out");
+
+    //    sc_trace (TRACEFILE, signal_video_in_irq, "video_in_irq" );
+    //    sc_trace (TRACEFILE, signal_wb_video_in_slave, "video_in_slave" );
+    //    sc_trace (TRACEFILE, signal_wb_video_in_master, "video_in_master" );
+
+    sc_trace (TRACEFILE, signal_increment_slave, "increment_slave" );
+    sc_trace (TRACEFILE, signal_increment_master, "increment_master" );
 #endif
 
     ////////////////////////////////////////////////////////////

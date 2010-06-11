@@ -33,33 +33,34 @@ namespace soclib { namespace caba {
 
         incHardX.p_resetn(p_resetn);
         incHardX.p_clk(p_clk);
-        incHardX.p_init_mux_switch(dummy_bool);
-        incHardX.p_Q0(dummy_float);
-        incHardX.p_Q1(dummy_float);
-        incHardX.p_Q2(dummy_float);
-        incHardX.p_Q3(dummy_float);
-        incHardX.p_R0(dummy_float);
-        incHardX.p_R1(dummy_float);
-        incHardX.p_R2(dummy_float);
-        incHardX.p_S0(dummy_float);
-        incHardX.p_S1(dummy_float);
-        incHardX.p_P0(dummy_float);
-        incHardX.p_OUT(dummy_float1);
+        incHardX.p_init_mux_switch(Xswitch);
+        incHardX.p_Q0(XYcoeffs[0]);
+        incHardX.p_Q1(XYcoeffs[1]);
+        incHardX.p_Q2(XYcoeffs[2]);
+        incHardX.p_Q3(XYcoeffs[3]);
+        incHardX.p_R0(XYcoeffs[4]);
+        incHardX.p_R1(XYcoeffs[5]);
+        incHardX.p_R2(XYcoeffs[6]);
+        incHardX.p_S0(XYcoeffs[7]);
+        incHardX.p_S1(XYcoeffs[8]);
+        incHardX.p_P0(XYcoeffs[9]);
+        incHardX.p_OUT(dummy_float);
 
         incHardY.p_resetn(p_resetn);
         incHardY.p_clk(p_clk);
-        incHardY.p_init_mux_switch(dummy_bool);
-        incHardY.p_Q0(dummy_float);
-        incHardY.p_Q1(dummy_float);
-        incHardY.p_Q2(dummy_float);
-        incHardY.p_Q3(dummy_float);
-        incHardY.p_R0(dummy_float);
-        incHardY.p_R1(dummy_float);
-        incHardY.p_R2(dummy_float);
-        incHardY.p_S0(dummy_float);
-        incHardY.p_S1(dummy_float);
-        incHardY.p_P0(dummy_float);
+        incHardY.p_init_mux_switch(Yswitch);
+        incHardY.p_Q0(XYcoeffs[10]);
+        incHardY.p_Q1(XYcoeffs[11]);
+        incHardY.p_Q2(XYcoeffs[12]);
+        incHardY.p_Q3(XYcoeffs[13]);
+        incHardY.p_R0(XYcoeffs[14]);
+        incHardY.p_R1(XYcoeffs[15]);
+        incHardY.p_R2(XYcoeffs[16]);
+        incHardY.p_S0(XYcoeffs[17]);
+        incHardY.p_S1(XYcoeffs[18]);
+        incHardY.p_P0(XYcoeffs[19]);
         incHardY.p_OUT(dummy_float1);
+
 
 //        buffer.p_clk(p_clk);
 //        buffer.p_resetn(p_resetn);
@@ -97,14 +98,10 @@ namespace soclib { namespace caba {
 
             switch(slave_state) {
 
-                case IDLE:
-                    next_state = WAIT_CONFIG;
-                    break;
-
                 case WAIT_CONFIG:
                     if (p_wb_slave.STB_I && p_wb_slave.CYC_I) {
                         if(p_wb_slave.WE_I)
-                            next_state = LOAD_COEFF;
+                            next_state = ACK_AND_BUSY;
                         else
                             printf("INCREMENT: Something tried to read us.");
                     } else {
@@ -112,15 +109,20 @@ namespace soclib { namespace caba {
                     }
                     break;
 
-                case ACK_AND_LOAD_COEFF:
-                    next_state = LOAD_COEFF;
+                case ACK_AND_BUSY:
+                    next_state = BUSY;
                     break;
 
-                case LOAD_COEFF:
+                case BUSY:
+                    if(coeff_address_start == 0 && coeff_address_current == 0) {
+                        next_state = WAIT_CONFIG;
+                    } else {
+                        next_state = BUSY;
+                    }
                     break;
 
                 default:
-                    next_state = IDLE;
+                    next_state = WAIT_CONFIG;
             }
 
             slave_state = next_state;
@@ -131,12 +133,39 @@ namespace soclib { namespace caba {
         void Increment<wb_param>::masterTransition() {
             int32_t next_state;
 
+            // Reset handling.
+            if(!p_resetn) {
+                master_state = IDLE;
+                coeff_count = 0;
+                return;
+            }
+
             switch(master_state) {
 
                 case IDLE:
+                    if( coeff_address_start != 0) {
+                        next_state = START_LOADING_COEFF;
+                    } else {
+                        next_state = IDLE;
+                    }
+                    break;
+
+                case START_LOADING_COEFF:
+                    cout << "INCREMENT: Start loading coeffs" << endl;
+                    next_state = LOAD_COEFF;
                     break;
 
                 case LOAD_COEFF:
+                    if(coeff_count >= 2 * N_COEFFS) {
+                        cout << "INCREMENT: Done loading coeffs" << endl;
+                        next_state = IDLE;
+                    } else {
+                        next_state = LOAD_COEFF;
+                        if(p_wb_master.ACK_I) {
+                            coeff_count++;
+                            coeff_address_current += sizeof(COEFF_TYPE);
+                        }
+                    }
                     break;
 
                 default:
@@ -149,19 +178,15 @@ namespace soclib { namespace caba {
 
     template <typename wb_param> \
         void Increment<wb_param>::slaveMoore() {
-            int32_t next_state;
 
             switch(slave_state) {
-
-                case IDLE:
-                    p_wb_slave.ACK_O = 0;
-                    break;
 
                 case WAIT_CONFIG:
                     p_wb_slave.ACK_O = 0;
                     break;
 
-                case ACK_AND_LOAD_COEFF:
+                case ACK_AND_BUSY:
+                    cout << "INCREMENT: Got an address." << endl;
                     // Update the address and acknowledge the request.
                     coeff_address_start = p_wb_slave.DAT_I.read();
                     coeff_address_current = p_wb_slave.DAT_I.read();
@@ -170,7 +195,8 @@ namespace soclib { namespace caba {
                     p_wb_slave.ACK_O = 1;
                     break;
 
-                case LOAD_COEFF:
+                case BUSY:
+                    p_wb_slave.ACK_O = 0;
                     break;
 
                 default:
@@ -181,6 +207,39 @@ namespace soclib { namespace caba {
 
     template <typename wb_param> \
         void Increment<wb_param>::masterMoore() {
+
+            switch(master_state) {
+
+                case IDLE:
+                    coeff_address_start = 0;
+                    coeff_address_current = 0;
+                    Xswitch = 0;
+                    Yswitch = 0;
+                    coeff_count = 0;
+                    p_wb_master.STB_O = 0;
+                    p_wb_master.CYC_O = 0;
+                    p_wb_master.WE_O = 0;
+                    p_wb_master.SEL_O = 0x0;
+                    break;
+
+                case START_LOADING_COEFF:
+                    Xswitch = 1;
+                    Yswitch = 1;
+                    p_wb_master.ADR_O = coeff_address_current;
+                    p_wb_master.STB_O = 1;
+                    p_wb_master.CYC_O = 1;
+                    p_wb_master.WE_O = 0;
+                    p_wb_master.SEL_O = 0xF;
+                    break;
+
+                case LOAD_COEFF:
+                    XYcoeffs[coeff_count] = static_cast<COEFF_TYPE>(p_wb_master.DAT_I.read());
+                    p_wb_master.ADR_O = coeff_address_current;
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 }}
