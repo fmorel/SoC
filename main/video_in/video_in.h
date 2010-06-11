@@ -32,7 +32,7 @@ namespace soclib { namespace caba {
                 sc_in<unsigned char>    pixel_in;
 
                 // Interrupt signal.
-                sc_out<bool>            interrupt;
+                sc_out<bool>            p_interrupt;
 
                 sc_signal<bool>         p_video_clk_temp;
                 sc_signal<bool>         line_valid_temp;
@@ -69,7 +69,8 @@ namespace soclib { namespace caba {
                 char        pixel_temp;
 
                 bool        video_clk_rising;
-
+                
+                bool        interrupt;
                 enum states {
                     UNDEFINED,
                     // Master states.

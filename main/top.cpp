@@ -241,7 +241,7 @@ int _main(int argc, char *argv[])
     video_in_w.line_valid          (line_valid);
     video_in_w.frame_valid         (frame_valid);
     video_in_w.pixel_in            (pixel);
-    video_in_w.interrupt           (signal_video_in_irq);
+    video_in_w.p_interrupt           (signal_video_in_irq);
     video_in_w.p_wb_slave          (signal_wb_video_in_slave);
     video_in_w.p_wb_master         (signal_wb_video_in_master);
 

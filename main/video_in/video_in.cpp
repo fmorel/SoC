@@ -55,8 +55,11 @@ namespace soclib { namespace caba {
                 write_address = 0;
                 w_line = 0; w_pixel = 0;
                 r_line = 0; r_pixel = 0;
+                interrupt = 0;
                 return;
             }
+
+            p_interrupt = interrupt;
 
             switch(slave_state) {
 
@@ -206,6 +209,8 @@ namespace soclib { namespace caba {
                     break;
 
                 case ACK_AND_WAIT_FRAME:
+                    // We just got an address. Remove interrupt.
+                    interrupt = 0;
                     // Update the address and acknowledge the reqest.
                     start_address = p_wb_slave.DAT_I.read();
                     write_address = p_wb_slave.DAT_I.read();
@@ -276,7 +281,6 @@ namespace soclib { namespace caba {
                     p_wb_master.CYC_O = 0;
                     p_wb_master.WE_O = 0;
                     p_wb_master.SEL_O = 0;
-                    interrupt = 0;
                     break;
     
                 case START_FLUSH: {
@@ -316,7 +320,6 @@ namespace soclib { namespace caba {
                 case STOP_FLUSH:
 //                    cout << "VIDEOIN: Stop flush" << endl;
                     if(p_wb_master.ACK_I) {
-												interrupt = 0;
 												p_wb_master.STB_O = 0;
 												p_wb_master.CYC_O = 0;
 												p_wb_master.WE_O = 0;

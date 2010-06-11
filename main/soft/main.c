@@ -41,29 +41,24 @@
 
 volatile unsigned int video_in_index;
 volatile unsigned int processing_index;
-int overwriting;
 volatile int difference;
 image_t images[IMAGES_NUMBER] = { { { 0 } } };
 image_coeffs_t image_coeffs;
 
 
 void video_in_handler() {
+  video_in_index++;
   //Give video_in an address.
   VIDEO_IN  = (uint32_t)&images[(video_in_index)%IMAGES_NUMBER] ;
-  if ((video_in_index - processing_index) <2) {
-    video_in_index++;
-		overwriting = 0;
-  } else {
-		overwriting = 1;
-	}
+  if (video_in_index - processing_index == 2) {
+    disable_irq (2);
+  }
 }
 
 void video_processing_task() {
   for(;;) {
-		//Wait until :
-	  //We are not overwriting images and difference is >=2
-		//OR we are overwriting images and difference is >=1
-    while((video_in_index - processing_index ) < (2-overwriting));
+    //Wait unilt video_in_index is greater than processing_index
+    while(video_in_index  == processing_index);
 
     uint32_t image_address = (uint32_t)&images[processing_index%IMAGES_NUMBER];
     my_printf("Processing image : %x\n\r",image_address);
@@ -71,6 +66,8 @@ void video_processing_task() {
     VIDEO_OUT = image_address;
     my_printf("Processed image : %x\n\r",image_address);
     processing_index++;
+    //Enable irq because we finished processing one image.
+    enable_irq(2);
   }
 }
 
@@ -80,11 +77,11 @@ int main(void) {
 
   RegisterIrqEntry(2, &video_in_handler);
 
+  //Initialize processing
   processing_index = 0;
-  video_in_index = 1;
-	overwriting = 0;
 
   //Initialize VIDEO_IN
+  video_in_index = 0;
   VIDEO_IN  = (uint32_t)&images[0] ;
 
   video_processing_task();
