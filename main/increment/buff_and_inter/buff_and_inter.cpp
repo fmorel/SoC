@@ -69,7 +69,7 @@ namespace soclib {
 			i++;
 			signal_write_enable=(i<256);
 			signal_buffer_in=0x12345678+i;
-			if(i==800){
+			if(i==3000){
 			    i=0;
 			    loaded=true;
 			}

@@ -157,6 +157,7 @@ namespace soclib {
 
 			break;
 		    case NEW_TILE_REQUEST:
+			std::cout << "New tile request " << std::endl;
 			debug_state = 4;
 			last_init_poly=!last_init_poly;
 			next_tile_happened=true;
