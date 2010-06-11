@@ -23,7 +23,7 @@ namespace soclib {
       x_min("x_min"),
       y_min("y_min"),
       intensity("intensity"),
-      new_tile("new_tile"),
+      tile_ready("tile_ready"),
       ask_for_x_y("ask_for_x_y"),
       valid("valid")
     {
@@ -104,7 +104,6 @@ namespace soclib {
 
     template <typename wb_param> \
       void BufInter<wb_param>::BufInterTransition() {
-
         if (p_resetn == false ) {
           next_state=WB_LOADING_START;
           state=WB_LOADING_START;
@@ -198,8 +197,7 @@ namespace soclib {
            **************************************************/
 
           case WB_LOADING_START:
-            new_tile=false;
-            valid=false;
+            valid=0;
             break;
 
           case WB_LOADING_WAIT:

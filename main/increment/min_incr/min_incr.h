@@ -4,6 +4,7 @@
 #include <systemc>
 #include <stdint.h>
 #include "wb_slave.h"
+#include "wb_master.h"
 #include "../../segmentation.h"
 #include "../increment_hard/increment_hard.h"
 
@@ -17,7 +18,7 @@ namespace soclib { namespace caba {
 		soclib::caba::IncrementHard y_incrementHard;
 		soclib::caba::IncrementHard x_min_incrementHard;
 		soclib::caba::IncrementHard y_min_incrementHard;
-		float registered_poly[2][20];
+		float registered_poly[1][20];
 
 		sc_signal<bool> signal_x_min_mux;
 		sc_signal<bool> signal_y_min_mux;
@@ -28,23 +29,34 @@ namespace soclib { namespace caba {
 
 		float x_min_internal,y_min_internal;
 
-		int poly_index;
-		bool good_to_send;
-		int last_init_poly;
 		int next_state;
-		int init_latency;
-		bool next_tile_happened;
 		int i;
 		bool unvalid;
 
 		enum MinIncrStates {
 		    WAIT_CONFIG,
+        WB_LOADING_START,
+        WB_LOADING_WAIT,
+        WB_LOADING_WRITE,
+        WB_LOADING_ENDLINE,
+        WB_LOADING_END,
 		    INIT_INCR_MIN,
+        WAIT_COMPUTE_MIN,
+        WAIT_X_Y,
 		    INIT_INCR,
-		    NEW_TILE_REQUEST
+        WAIT_COMPUTE,
 		};
 
+    enum wbslaveStates {
+       SLAVE_IDLE,
+       SLAVE_REQ
+    };
+
 		int state;
+    int nb_tiles;
+    int slaveState;
+
+    uint32_t base_address,address;
 	    protected:
 		SC_HAS_PROCESS(MinIncr);
 
@@ -63,16 +75,19 @@ namespace soclib { namespace caba {
 		sc_core::sc_out<float>  y_min;
 		sc_core::sc_out<float>  x;
 		sc_core::sc_out<float>  y;
-		sc_core::sc_in<bool>    new_tile;
+		sc_core::sc_out<bool>    tile_ready;
 		sc_core::sc_in<bool>    ask_for_x_y;
 
 		//wishbone interface
 		WbSlave <wb_param>		  p_wb_slave;
+    WbMaster <wb_param>      p_wb_master;
 		// constructor
 		MinIncr (sc_core::sc_module_name insname);
 		void MinIncrComputeMin();
 		void MinIncrTransition();
 		void MinIncrMoore();
+    void slaveMoore();
+    void slaveTransition();
 	};
 }}
 #endif

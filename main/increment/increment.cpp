@@ -30,7 +30,7 @@ namespace soclib { namespace caba {
 	    //Connection of min_incr entries
 	    min_incr.p_clk		(p_clk);
 	    min_incr.p_resetn		(p_resetn);
-	    min_incr.new_tile		(signal_new_tile);
+	    min_incr.tile_ready		(signal_new_tile);
 	    min_incr.ask_for_x_y	(signal_ask);
 	    min_incr.p_wb_slave		(p_wb_slave);
 	    min_incr.x			(signal_x);
@@ -47,7 +47,7 @@ namespace soclib { namespace caba {
 	    buff_and_inter.x		(signal_x);
 	    buff_and_inter.x_min	(signal_x_min);
 	    buff_and_inter.y_min	(signal_y_min);
-	    buff_and_inter.new_tile	(signal_new_tile);
+	    buff_and_inter.tile_ready	(signal_new_tile);
 	    buff_and_inter.ask_for_x_y	(signal_ask);
 	    buff_and_inter.intensity	(signal_intensity);
 	    buff_and_inter.valid	(signal_valid);

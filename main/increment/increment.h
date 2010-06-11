@@ -19,7 +19,7 @@ namespace soclib { namespace caba {
 		soclib::caba::BufInter <wb_param>   buff_and_inter;
 		sc_signal<bool> signal_new_tile;
 		sc_signal<bool> signal_ask;
-		sc_signal<char> signal_intensity;
+		sc_signal<unsigned char> signal_intensity;
 		sc_signal<bool> signal_valid;
 		sc_signal<float> signal_x;
 		sc_signal<float> signal_x_min;
