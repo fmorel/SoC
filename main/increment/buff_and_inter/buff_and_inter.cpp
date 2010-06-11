@@ -175,7 +175,8 @@ namespace soclib {
             break;  
           
           case NEW_TILE:
-            next_state=WB_LOADING_START;
+            if (tile_ready.read())
+              next_state=WB_LOADING_START;
 
       }
 
@@ -237,7 +238,6 @@ namespace soclib {
 
       case NEW_TILE:
         valid=0;
-        new_tile=1;
 
 		}
 	}

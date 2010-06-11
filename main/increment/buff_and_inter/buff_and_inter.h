@@ -74,7 +74,7 @@ namespace soclib { namespace caba {
         sc_core::sc_out<unsigned char>   intensity;
 
         ////// control ports /////
-        sc_core::sc_out<bool>   new_tile;
+        sc_core::sc_in <bool>   tile_ready;
         sc_core::sc_out<bool>   ask_for_x_y;
         sc_core::sc_out<bool>   valid;
 
