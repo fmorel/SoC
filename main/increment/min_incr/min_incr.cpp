@@ -112,9 +112,6 @@ namespace soclib {
 		y = signal_y_tmp;
 		x_min = signal_x_min_tmp;
 		y_min = signal_y_min_tmp;
-		if(((int)signal_x_tmp+(int)signal_y_tmp+(int)signal_x_min_tmp+(int)signal_y_min_tmp) > 0)
-		    std::cout << (int)signal_x_tmp << " " << (int)signal_y_tmp << " " 
-			<< (int)signal_x_min_tmp << " " << (int)signal_y_min_tmp << std::endl;
 	    }
 
 	template <typename wb_param> \

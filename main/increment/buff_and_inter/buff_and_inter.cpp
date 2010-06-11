@@ -69,7 +69,7 @@ namespace soclib {
 			i++;
 			signal_write_enable=(i<256);
 			signal_buffer_in=0x12345678+i;
-			if(i==5000){
+			if(i==800){
 			    i=0;
 			    loaded=true;
 			}
@@ -113,7 +113,7 @@ namespace soclib {
 		    //std::cout << " Changing to load" << std::endl;
 		    next_state=LOADING;
 		}
-		if(enough==16)
+		if(enough==12)
 		    next_state=IDLE;
 
 		intensity = signal_intensity;

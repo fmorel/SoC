@@ -272,8 +272,10 @@ int _main(int argc, char *argv[])
     // To avoid adding inverters here, we consider
     // them active high
     lm32.p_irq[0] (signal_tty_irq);
-    lm32.p_irq[1] (signal_new_tile_display);
-    for (int i=1; i<32; i++)
+    lm32.p_irq[1] (unconnected_irq);
+    lm32.p_irq[2] (unconnected_irq);
+    lm32.p_irq[3] (signal_new_tile_display);
+    for (int i=4; i<32; i++)
 	lm32.p_irq[i] (unconnected_irq);
 
     ////////////////////////////////////////////////////////////
@@ -304,7 +306,7 @@ int _main(int argc, char *argv[])
     sc_trace_file *TRACEFILE;
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
     //sc_trace (TRACEFILE, signal_resetn, "resetn" );
-    sc_trace (TRACEFILE, signal_clk,    "clk"    );
+//    sc_trace (TRACEFILE, signal_clk,    "clk"    );
     sc_trace (TRACEFILE, signal_x_display ,"x");
     sc_trace (TRACEFILE, signal_x_min_display ,"x_min");
     sc_trace (TRACEFILE, signal_y_display ,"y");
@@ -315,7 +317,7 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_valid_display ,"valid");
     sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
     sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
-//    sc_trace (TRACEFILE, signal_increment_slave ,"wb_slave");
+    sc_trace (TRACEFILE, signal_increment_slave ,"wb_slave");
 
 #endif
 
