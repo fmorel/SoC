@@ -32,7 +32,8 @@ namespace soclib { namespace caba {
 	    min_incr.p_resetn		(p_resetn);
 	    min_incr.tile_ready		(signal_new_tile);
 	    min_incr.ask_for_x_y	(signal_ask);
-	    min_incr.p_wb_slave		(p_wb_slave);
+	    min_incr.p_wb_slave		(p_minincr_slave);
+	    min_incr.p_wb_master		(p_minincr_master);
 	    min_incr.x			(signal_x);
 	    min_incr.x_min		(signal_x_min);
 	    min_incr.y			(signal_y);
@@ -53,7 +54,9 @@ namespace soclib { namespace caba {
 	    buff_and_inter.valid	(signal_valid);
 
 	  
-	    buff_and_inter.p_wb_master	(p_wb_master);
+	    buff_and_inter.p_wb_master	(p_buffer_master);
+	    buff_and_inter.p_wb_slave	(p_buffer_slave);
+
 	}
 
     template <typename wb_param> \

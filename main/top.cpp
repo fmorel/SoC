@@ -79,7 +79,8 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("ram" , RAM_BASE , RAM_SIZE , IntTab(1), true));
     maptab.add(Segment("tty"  , TTY_BASE  , TTY_SIZE  , IntTab(2), false));
     //add simple slave
-    maptab.add(Segment("increment", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), false));
+    maptab.add(Segment("minincr", INCREMENT_BASE, INCREMENT_SIZE, IntTab(3), false));
+    maptab.add(Segment("buffer", BUFFER_BASE, BUFFER_SIZE, IntTab(4), false));
 
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
@@ -105,18 +106,13 @@ int _main(int argc, char *argv[])
     soclib::caba::WbSignal<wb_param> signal_wb_ram("signal_wb_ram");
     soclib::caba::WbSignal<wb_param> signal_wb_rom("signal_wb_rom");
     soclib::caba::WbSignal<wb_param> signal_wb_tty("signal_wb_tty");
+
+    soclib::caba::WbSignal<wb_param> signal_minincr_master("signal_minincr_master");
+    soclib::caba::WbSignal<wb_param> signal_minincr_slave("signal_minincr_slave");
     
-    //WB slave	
-    //    soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
-    //    //WB master
-    //    soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
-    //
-    //
     
-    //WB slave	
-    soclib::caba::WbSignal<wb_param> signal_increment_slave("signal_increment_slave");
-    //WB master
-    soclib::caba::WbSignal<wb_param> signal_increment_master("signal_increment_master");
+    soclib::caba::WbSignal<wb_param> signal_buffer_master("signal_buffer_master");
+    soclib::caba::WbSignal<wb_param> signal_buffer_slave("signal_buffer_slave");
 
     /*DEBUG*/    // Increment Signals
     /*DEBUG*/    sc_signal<float>	signal_x_display;
@@ -171,7 +167,7 @@ int _main(int argc, char *argv[])
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 2,4);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 3,5);
 
     //VideoGen
     //soclib::caba::VideoGen my_videogen ("video_gen");
@@ -196,8 +192,11 @@ int _main(int argc, char *argv[])
     soclib::caba::Increment<wb_param> increment("increment");
     increment.p_clk (signal_clk);
     increment.p_resetn (signal_resetn);
-    increment.p_wb_slave (signal_increment_slave);
-    increment.p_wb_master (signal_increment_master);
+	  increment.p_buffer_master(signal_buffer_master);
+		increment.p_buffer_slave(signal_buffer_slave);
+
+    increment.p_minincr_master(signal_minincr_master);
+    increment.p_minincr_slave(signal_minincr_slave);
 
 
     /*DEBUG*/	    increment.x_display(signal_x_display);
@@ -258,12 +257,13 @@ int _main(int argc, char *argv[])
     wbinterco.p_resetn(signal_resetn);
 
     wbinterco.p_from_master[0](signal_wb_lm32);
-    wbinterco.p_from_master[1](signal_increment_master);
+    wbinterco.p_from_master[1](signal_minincr_master);
+    wbinterco.p_from_master[2](signal_buffer_master);
     wbinterco.p_to_slave[0](signal_wb_rom);
     wbinterco.p_to_slave[1](signal_wb_ram);
     wbinterco.p_to_slave[2](signal_wb_tty);
-    wbinterco.p_to_slave[3](signal_increment_slave);
-
+    wbinterco.p_to_slave[3](signal_minincr_slave);
+    wbinterco.p_to_slave[4](signal_buffer_slave);
     // lm32
     lm32.p_clk(signal_clk);
     lm32.p_resetn(signal_resetn);
@@ -317,7 +317,7 @@ int _main(int argc, char *argv[])
     sc_trace (TRACEFILE, signal_valid_display ,"valid");
     sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
     sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
-    sc_trace (TRACEFILE, signal_increment_slave ,"wb_slave");
+    sc_trace (TRACEFILE, signal_minincr_slave ,"wb_slave");
 
 #endif
 

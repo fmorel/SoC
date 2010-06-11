@@ -47,8 +47,11 @@ namespace soclib { namespace caba {
 		/*DEBUG*/	    sc_core::sc_out<int>	min_incr_debug_state;
 
 		//wishbone interface
-		WbMaster <wb_param>		  p_wb_master;
-		WbSlave <wb_param>		  p_wb_slave;
+		WbMaster <wb_param>		  p_buffer_master;
+		WbSlave <wb_param>		  p_buffer_slave;
+
+    WbMaster <wb_param> p_minincr_master;
+    WbSlave <wb_param> p_minincr_slave;
 		// constructor
 		Increment (sc_core::sc_module_name insname);
 
