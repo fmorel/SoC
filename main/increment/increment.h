@@ -29,7 +29,11 @@ namespace soclib { namespace caba {
 //            soclib::caba::Interpolation interpolation;
 //            soclib::caba::Buffer buffer;
 
-            sc_signal<COEFF_TYPE> dummy_float,dummy_float1;
+            sc_signal<COEFF_TYPE> outX, outY;
+            COEFF_TYPE minX, minY;
+            bool computeMinsEnabled;
+            int32_t min_count;
+
             sc_signal<bool> dummy_bool;
             sc_signal<unsigned char> dummy_uchar[4];
             sc_signal<uint32_t> dummy_uint32;
@@ -50,6 +54,8 @@ namespace soclib { namespace caba {
             WbSlave <wb_param>      p_wb_slave;
             // Constructor
             Increment (sc_core::sc_module_name insname);
+
+            void computeMins();
 
             void slaveTransition();
             void slaveMoore();

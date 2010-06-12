@@ -101,8 +101,13 @@ int main(void) {
     int i;
     uint32_t tab[20];
     for(i = 0; i < 20; i++) {
-        tab[i] = 20 - i;
+        tab[i] = 0;
     }
+    tab[6] = 0;
+    tab[16] = 0;
+
+    tab[3] = 1;
+    tab[13] = 1;
 
     INCREMENT = tab;
 
