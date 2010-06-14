@@ -36,12 +36,8 @@ namespace soclib { namespace caba {
     float dx,dy;
     dx = prevprevx-Ex;
     dy = prevprevy-Ey;
-    cout << "dx dy" << dx << "," << dy << endl;
-    cout << (int)intensities[0] <<(int) intensities[1] << (int)intensities[2] <<(int) intensities[3] <<endl;
     float temp = (1-dx)*(1-dy)*intensities[0] + (1-dx) * dy * intensities[1] + dx * ( 1 - dy ) * intensities[2] + dx * dy * intensities[3];
-    cout << "and temp is : " << temp << endl;
     int temp1 = (int)temp;
-    cout << "and temp1 is : " << temp1 << endl;
     p_out = temp1;
 
     Ex=(int)x;

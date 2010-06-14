@@ -6,7 +6,7 @@
 #include "wb_slave.h"
 #include "wb_master.h"
 #include "utils.h"
-#include "buffer.h"
+#include "single_buffer.h"
 #include "interpolation.h"
 #include "segmentation.h"
 
@@ -39,7 +39,7 @@ namespace soclib { namespace caba {
         sc_signal<uint32_t> signal_buffer_in;
         sc_signal<float> signal_x;
         sc_signal<float> signal_y;
-        sc_signal<int>   signal_buffer_command[2];
+        sc_signal<uint32_t>   signal_buffer_command[2];
         sc_signal<unsigned char>   signal_buffer_out[4];
 
         //used by the wb master

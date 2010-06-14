@@ -13,7 +13,7 @@ Module('caba:buff_and_inter',
 	],
 	uses = [
 	Uses('caba:wishbone'),
-	Uses('caba:buffer'),
+	Uses('caba:single_buffer'),
 	Uses('caba:interpolation'),
 	],
 	debug = True ,
