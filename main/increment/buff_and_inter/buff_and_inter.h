@@ -17,7 +17,7 @@ namespace soclib { namespace caba {
       private:
        
         //buffer submodule
-        soclib::caba::Buffer buffer;
+        soclib::caba::SingleBuffer buffer;
         //interpolation submodule
         soclib::caba::Interpolation interpolation;
         

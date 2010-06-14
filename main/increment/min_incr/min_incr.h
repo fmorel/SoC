@@ -47,10 +47,6 @@ namespace soclib { namespace caba {
         WAIT_COMPUTE,
 		};
 
-    enum wbslaveStates {
-       SLAVE_IDLE,
-       SLAVE_REQ
-    };
 
 		int state;
     int nb_tiles;

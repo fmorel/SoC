@@ -1,8 +1,8 @@
 #include "buff_and_inter.h"
 
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
 
+        #define SLAVE_IDLE 0
+        #define SLAVE_REQ 1
 namespace soclib { 
   namespace caba {
     int i=0;

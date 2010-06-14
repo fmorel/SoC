@@ -1,5 +1,7 @@
 #include "output_tile.h"
 
+#define SLAVE_IDLE 0
+#define SLAVE_REQ 1
 namespace soclib { namespace caba {
 
 
