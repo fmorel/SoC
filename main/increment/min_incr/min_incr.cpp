@@ -1,7 +1,6 @@
 #include "min_incr.h"
+#include "utils.h"
 
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
 
 namespace soclib { 
   namespace caba {

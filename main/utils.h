@@ -13,6 +13,8 @@
 //video_in
 #define VIDEO_IN_BUFSIZE 4
 
+#define BUS_CHUNK_SIZE 8
+
 //tile size
 #define TILE_SIZE 16
 #define ANTE_TILE_SIZE 32

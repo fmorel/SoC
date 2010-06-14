@@ -157,7 +157,7 @@ int main(void) {
     dataPoly[i*20+0] = a_Q0;
     dataPoly[i*20+1] = a_Q1;
     dataPoly[i*20+2] = a_Q2;
-    dataPoly[i*20+3] = a_Q3;
+    dataPoly[i*20+3] = a_P3;
     dataPoly[i*20+4] = a_R0;
     dataPoly[i*20+5] = a_R1;
     dataPoly[i*20+6] = a_R2;
@@ -165,20 +165,22 @@ int main(void) {
     dataPoly[i*20+8] = a_S1;
     dataPoly[i*20+9] = a_P0;
     
-    dataPoly[i*20+10] = a_Q0;
-    dataPoly[i*20+11] = a_Q1;
-    dataPoly[i*20+12] = a_Q2;
-    dataPoly[i*20+13] = a_Q3;
-    dataPoly[i*20+14] = a_R0;
-    dataPoly[i*20+15] = a_R1;
-    dataPoly[i*20+16] = a_R2;
-    dataPoly[i*20+17] = a_S0;
-    dataPoly[i*20+18] = a_S1;
-    dataPoly[i*20+19] = a_P0;
+    dataPoly[i*20+10] = b_Q0;
+    dataPoly[i*20+11] = b_Q1;
+    dataPoly[i*20+12] = b_Q2;
+    dataPoly[i*20+13] = b_P3;
+    dataPoly[i*20+14] = b_R0;
+    dataPoly[i*20+15] = b_R1;
+    dataPoly[i*20+16] = b_R2;
+    dataPoly[i*20+17] = b_S0;
+    dataPoly[i*20+18] = b_S1;
+    dataPoly[i*20+19] = b_P0;
 
-    *((volatile unsigned int *) INCREMENT_BASE ) = dataPoly;
 
  }
+  
+  *((volatile unsigned int *) INCREMENT_BASE ) = dataPoly;
+  *((volatile unsigned int *) OUTPUT_BASE) = RAM_BASE;
  getchar();
   return 0;
 

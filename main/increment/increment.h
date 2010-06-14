@@ -9,6 +9,7 @@
 #include "../segmentation.h"
 #include "./min_incr/min_incr.h"
 #include "./buff_and_inter/buff_and_inter.h"
+#include "./output_tile/output_tile.h"
 
 namespace soclib { namespace caba {
 

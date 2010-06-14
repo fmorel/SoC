@@ -26,8 +26,10 @@ namespace soclib { namespace caba {
 
     private:
       int state,next_state;
+      int slaveState;
       uint32_t buffer[TILE_SIZE*TILE_SIZE];
       uint32_t base_address,address,offset;
+      int index;
       int nb_tile;
       uint32_t outgoing_data;
       unsigned char incoming_pixel;
@@ -40,7 +42,7 @@ namespace soclib { namespace caba {
 
       //pixels coming from interpolation
       sc_core::sc_in<unsigned char> p_intensity;
-      sc_core::sc_in<unsigned char> p_valid;
+      sc_core::sc_in<bool> p_valid;
   
       //master to output the tile
       WbMaster <wb_param> p_wb_master;

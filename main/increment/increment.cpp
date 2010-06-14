@@ -8,6 +8,7 @@ namespace soclib { namespace caba {
 	: sc_core::sc_module(insname),
 	min_incr("min_incr"),
 	buff_and_inter("buff_and_inter"),
+  output_tile("output_tile"),
 	new_tile_display("new_tile_display"),
 	ask_for_x_y_display("ask_for_x_y_display"),
 	intensity_display("intensity_display"),

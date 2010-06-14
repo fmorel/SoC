@@ -171,7 +171,7 @@ namespace soclib {
           case INTERPOLING:
             i++;
             //TODO: needs to be adjusted
-            if (i==257)
+            if (i==256)
               next_state=NEW_TILE;
             break;  
 
