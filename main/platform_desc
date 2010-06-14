@@ -6,6 +6,7 @@ todo = Platform('caba', 'top.cpp',
             iss_t = 'common:iss2_simhelper',
             simhelper_iss_t = 'common:lm32'
             ),
+        Uses('caba:video_in'),
         Uses('caba:vci_ram'),
         Uses('caba:vci_rom'),
         Uses('caba:vci_multi_tty'),

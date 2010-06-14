@@ -23,7 +23,7 @@
  */
 
 //Include this first because of #define conflict (#define fp 27 somwhere screws up sdl header)
-//#include "display.h"
+#include "display.h"
 #define DO_TRACES
 
 // C/C++ std libs
@@ -50,12 +50,12 @@
 
 // locals
 #include "segmentation.h"
-//#include "video_gen.h"
 
+// --- Modules ---
+#include "video_gen.h"
+#include "video_in.h"
+#include "video_out.h"
 #include "increment.h"
-
-//Wb simple slave
-//#include "video_out.h"
 
 
 // real SystemC main
@@ -83,18 +83,18 @@ int _main(int argc, char *argv[])
     maptab.add(Segment("buffer", BUFFER_BASE, BUFFER_SIZE, IntTab(4), false));
     maptab.add(Segment("output", OUTPUT_BASE, OUTPUT_SIZE, IntTab(5), false));
 
+    maptab.add(Segment("video_out_slave", VIDEO_OUT_BASE, VIDEO_OUT_SIZE, IntTab(6), false));
+        
+    maptab.add(Segment("video_in"  , VIDEO_IN_BASE  , VIDEO_IN_SIZE  , IntTab(7), false));
+
     // Gloabal signals
     sc_time     clk_periode(10, SC_NS); // clk period
-    //sc_time	video_clk_periode(40,SC_NS);	//video clk at 25MHz
-    sc_clock	signal_clk("signal_clk",clk_periode);
-    //sc_clock 	signal_video_clk("signal_video_clk",video_clk_periode);
+    sc_time     video_clk_periode(40,SC_NS);    //video clk at 25MHz
+    sc_clock    signal_clk("signal_clk",clk_periode);
+    sc_clock    signal_video_clk("signal_video_clk",video_clk_periode);
 
     sc_signal<bool> signal_resetn("signal_resetn");
 
-    //Video signals
-    //    sc_signal<bool>        line_valid("line_val");
-    //    sc_signal<bool>        frame_valid("frame_val");
-    //    sc_signal<unsigned char> pixel("pixel_val");
 
 
     // interconnection signals
@@ -129,17 +129,29 @@ int _main(int argc, char *argv[])
     /*DEBUG*/    sc_signal<int>	    signal_min_incr_debug_state;
     /*DEBUG*/    sc_signal<int>	    signal_min_incr_debug_signal;
 
-    //video signals
-    //    sc_signal<bool> frame_valid_out("frame_valid_out");
-    //    sc_signal<bool> line_valid_out("line_valid_out");
-    //    sc_signal<unsigned char> pixel_out("pixel_out");
-    //
+
+    //WB slave    
+    soclib::caba::WbSignal<wb_param> signal_video_out_slave("signal_video_out_slave");
+		//WB master
+		soclib::caba::WbSignal<wb_param> signal_video_out_master("signal_video_out_master");
+		
+
+
+		//video signals
+		sc_signal<bool> frame_valid_out("frame_valid_out");
+		sc_signal<bool> line_valid_out("line_valid_out");
+		sc_signal<unsigned char> pixel_out("pixel_out");
+
+    soclib::caba::WbSignal<wb_param> signal_wb_video_in_slave("signal_wb_video_in_slave");
+    soclib::caba::WbSignal<wb_param> signal_wb_video_in_master("signal_wb_video_in_master");
 
     // irq from uart
     sc_signal<bool> signal_tty_irq("signal_tty_irq");
-
+    
     //irq from video_out
-    //    sc_signal<bool> signal_video_out_irq("video_out_irq");
+    sc_signal<bool> signal_video_out_irq("video_out_irq");
+    //irq from video_in
+    sc_signal<bool> signal_video_in_irq("video_in_irq");
     // unconnected irqs
     sc_signal<bool> unconnected_irq ("unconnected_irq");
 
@@ -166,11 +178,11 @@ int _main(int argc, char *argv[])
     // memories
     soclib::caba::VciRom<vci_param> rom("rom", IntTab(0), maptab, loader);
     soclib::caba::VciRam<vci_param> ram("ram", IntTab(1), maptab, loader);
-    soclib::caba::VciMultiTty<vci_param> vcitty("vcitty",	IntTab(2), maptab, "tty.log", NULL);
+    soclib::caba::VciMultiTty<vci_param> vcitty("vcitty",    IntTab(2), maptab, "tty.log", NULL);
 
     // WB interconnect
     //                                           sc_name    maptab  masters slaves
-    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 4,6);
+    soclib::caba::WbInterco<wb_param> wbinterco("wbinterco",maptab, 6,8);
 
     //VideoGen
     //soclib::caba::VideoGen my_videogen ("video_gen");
@@ -206,6 +218,13 @@ int _main(int argc, char *argv[])
     increment.p_output_slave(signal_output_slave);
 
 
+    my_videogen.pixel_out(pixel);
+    my_videogen.clk (signal_video_clk);
+    my_videogen.reset_n(signal_resetn);
+    my_videogen.line_valid(line_valid);
+    my_videogen.frame_valid(frame_valid);
+    
+    
     /*DEBUG*/	    increment.x_display(signal_x_display);
     /*DEBUG*/	    increment.x_min_display(signal_x_min_display);
     /*DEBUG*/	    increment.y_display(signal_y_display);
@@ -243,36 +262,54 @@ int _main(int argc, char *argv[])
     tty_w.p_wb                (signal_wb_tty);
 
     ////////////////////////////////////////////////////////////
-    //    ////////////////////// Video_out ////////////////////////////
-    //    ////////////////////////////////////////////////////////////
-    //    soclib::caba::VideoOut<wb_param> video_out("video_out");
-    //    video_out.p_clk (signal_clk);
-    //    video_out.p_video_clk (signal_video_clk);
-    //    video_out.p_resetn (signal_resetn);
-    //    video_out.p_wb_slave (signal_video_out_slave);
-    //    video_out.p_wb_master (signal_video_out_master);
-    //    video_out.p_frame_valid (frame_valid_out);
-    //    video_out.p_line_valid (line_valid_out);
-    //    video_out.p_pixel_out (pixel_out);
-    //    video_out.p_interrupt (signal_video_out_irq);
-    //
+    ////////////////////// Video_out ////////////////////////////
     ////////////////////////////////////////////////////////////
-    ///////////////////// WB Net List //////////////////////////
-    ////////////////////////////////////////////////////////////
+    soclib::caba::VideoOut<wb_param> video_out("video_out");
+    video_out.p_clk (signal_clk);
+    video_out.p_video_clk (signal_video_clk);
+    video_out.p_resetn (signal_resetn);
+    video_out.p_wb_slave (signal_video_out_slave);
+    video_out.p_wb_master (signal_video_out_master);
+    video_out.p_frame_valid (frame_valid_out);
+    video_out.p_line_valid (line_valid_out);
+    video_out.p_pixel_out (pixel_out);
+    video_out.p_interrupt (signal_video_out_irq);
 
-    wbinterco.p_clk(signal_clk);
+    // video_in
+    soclib::caba::VideoIn<wb_param> video_in_w ("video_in_w") ;
+    video_in_w.p_clk               (signal_clk);
+    video_in_w.p_video_clk         (signal_video_clk);
+    video_in_w.p_resetn            (signal_resetn);
+    video_in_w.line_valid          (line_valid);
+    video_in_w.frame_valid         (frame_valid);
+    video_in_w.pixel_in            (pixel);
+    video_in_w.p_interrupt           (signal_video_in_irq);
+    video_in_w.p_wb_slave          (signal_wb_video_in_slave);
+    video_in_w.p_wb_master         (signal_wb_video_in_master);
+
+      ////////////////////////////////////////////////////////////
+      ///////////////////// WB Net List //////////////////////////
+      ////////////////////////////////////////////////////////////
+
+      wbinterco.p_clk(signal_clk);
     wbinterco.p_resetn(signal_resetn);
 
     wbinterco.p_from_master[0](signal_wb_lm32);
     wbinterco.p_from_master[1](signal_minincr_master);
     wbinterco.p_from_master[2](signal_buffer_master);
     wbinterco.p_from_master[3](signal_output_master);
+    wbinterco.p_from_master[4](signal_video_out_master);
+    wbinterco.p_from_master[5](signal_wb_video_in_master);
+
     wbinterco.p_to_slave[0](signal_wb_rom);
     wbinterco.p_to_slave[1](signal_wb_ram);
     wbinterco.p_to_slave[2](signal_wb_tty);
     wbinterco.p_to_slave[3](signal_minincr_slave);
     wbinterco.p_to_slave[4](signal_buffer_slave);
     wbinterco.p_to_slave[5](signal_output_slave);
+    wbinterco.p_to_slave[6](signal_video_out_slave);
+    wbinterco.p_to_slave[7](signal_wb_video_in_slave);
+
     // lm32
     lm32.p_clk(signal_clk);
     lm32.p_resetn(signal_resetn);
@@ -281,18 +318,18 @@ int _main(int argc, char *argv[])
     // To avoid adding inverters here, we consider
     // them active high
     lm32.p_irq[0] (signal_tty_irq);
-    lm32.p_irq[1] (unconnected_irq);
-    lm32.p_irq[2] (unconnected_irq);
+    lm32.p_irq[1] (signal_video_out_irq);
+    lm32.p_irq[2] (signal_video_in_irq);
     lm32.p_irq[3] (signal_new_tile_display);
     for (int i=4; i<32; i++)
-	lm32.p_irq[i] (unconnected_irq);
+      lm32.p_irq[i] (unconnected_irq);
 
-    ////////////////////////////////////////////////////////////
-    //////////////////// VCI Net List //////////////////////////
-    ////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////
+      //////////////////// VCI Net List //////////////////////////
+      ////////////////////////////////////////////////////////////
 
-    // rom
-    rom.p_clk(signal_clk);
+      // rom
+      rom.p_clk(signal_clk);
     rom.p_resetn(signal_resetn);
     rom.p_vci(signal_vci_rom);
 
@@ -314,22 +351,20 @@ int _main(int argc, char *argv[])
 #ifdef DO_TRACES
     sc_trace_file *TRACEFILE;
     TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
-    //sc_trace (TRACEFILE, signal_resetn, "resetn" );
-    //sc_trace (TRACEFILE, signal_clk,    "clk"    );
-    sc_trace (TRACEFILE, signal_x_display ,"x");
-    sc_trace (TRACEFILE, signal_x_min_display ,"x_min");
-    sc_trace (TRACEFILE, signal_y_display ,"y");
-    sc_trace (TRACEFILE, signal_y_min_display ,"y_min");
+      //sc_trace (TRACEFILE, signal_resetn, "resetn" );
+      //sc_trace (TRACEFILE, signal_clk,    "clk"    );
     sc_trace (TRACEFILE, signal_new_tile_display ,"new_tile");
     sc_trace (TRACEFILE, signal_ask_for_x_y_display ,"ask_for_x_y");
     sc_trace (TRACEFILE, signal_intensity_display ,"intensity");
     sc_trace (TRACEFILE, signal_valid_display ,"valid");
     sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
     sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
-    sc_trace (TRACEFILE, signal_minincr_master ,"minincr_master");
+    sc_trace (TRACEFILE, signal_minincr_master ,"master_minincr");
     sc_trace (TRACEFILE, signal_buffer_master, "master_buffer");
     sc_trace (TRACEFILE, signal_output_master, "master_output");
-    
+    sc_trace(TRACEFILE, signal_video_out_master, "master_videout");
+    sc_trace (TRACEFILE, signal_wb_video_in_slave, "master_videoin");
+
 #endif
 
     ////////////////////////////////////////////////////////////

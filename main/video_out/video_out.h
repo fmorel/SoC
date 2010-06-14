@@ -10,9 +10,9 @@
 #include "utils.h"
 
 //state of the master FSM
-#define MASTER_IDLE 0
 #define MASTER_BEGINLINE 1
 #define MASTER_TRANS 2
+#define MASTER_TRANSPAUSE 5
 #define MASTER_ENDOFLINE 3
 #define MASTER_ENDOFTRANS 4
 
@@ -24,11 +24,12 @@
 #define OUTPUT_IDLE 0
 #define OUTPUT_LINE 1
 #define OUTPUT_WAITLINE 2
-#define OUTPUT_WAITFRAME 3
+#define OUTPUT_WAITFRAME1 3
+#define OUTPUT_WAITFRAME2 4
 
 //synchronisation duration (in cycles)
-#define LINE_SYNC 160		
-#define FRAME_SYNC (WIDTH +LINE_SYNC)*40
+//#define LINE_SYNC 160		
+//#define FRAME_SYNC (WIDTH +LINE_SYNC)*40
 
 
 //number of lines buffered
@@ -44,6 +45,7 @@ namespace soclib { namespace caba {
 							int outputState,nextOutputState;
 							int cycle_count;
 							uint64_t address;
+							uint64_t base_address;
 							unsigned char lineBuffer[BUFLINE][WIDTH];
 							
 							int writingLine, writingWord;

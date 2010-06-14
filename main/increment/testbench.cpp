@@ -14,7 +14,34 @@ using namespace sc_core;
 
 int _main(int argc, char* argv[]) {
 
-  sc_start(0);
+  // Define our WB parameters
+  typedef soclib::caba::WbParams<32,32> wb_param;
+
+  sc_time     clk_periode(10, SC_NS); // clk period
+  sc_clock	signal_clk("signal_clk",clk_periode);
+  sc_signal<bool> signal_resetn("signal_resetn");
+
+  Increment<wb_param> increment("Increment");
+
+  soclib::caba::WbSignal<wb_param> signal_wb_slave("signal_wb_slave");
+  soclib::caba::WbSignal<wb_param> signal_wb_master("signal_wb_master");
+
+  increment.p_clk(signal_clk);
+  increment.p_resetn(signal_resetn);
+  //wishbone interface
+  increment.p_wb_master(signal_wb_master);
+  increment.p_wb_slave(signal_wb_slave);
+ 
+
+  //TODO
+  //Est-ce qu'on veut tester ce module indépendant du wishbone ?
+  sc_start(sc_core::sc_time(0, SC_NS));
+  signal_resetn = false;
+  sc_start(sc_core::sc_time(1, SC_NS));
+  signal_resetn = true;
+  sc_start(sc_core::sc_time(9, SC_NS));
+  signal_resetn = true;
+
   return EXIT_FAILURE;
 }
 

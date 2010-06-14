@@ -9,3 +9,7 @@
 *.log
 #ignore elf files
 *.elf
+#ignore deps files
+.deps
+#ignore traces !
+*.vcd

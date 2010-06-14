@@ -28,10 +28,11 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "utils.h"
+#include "process.h"
 #include "lm32_irq.h"
 #include "segmentation.h"
 #include "my_printf.h"
-#include "utils.h"
 
 
 
@@ -48,7 +49,9 @@ const static int b[4][4] =
   { 0  ,0  ,0  ,0 } } ;
 
 
-int main(void) {
+static int dataPoly[NB_TILES*20];
+
+void computePolys (void) {
   // irq_enable();
   //RegisterIrqEntry(3, &new_tile_handler);
 
@@ -79,9 +82,8 @@ int main(void) {
   int Y_2;
   int a_P1,a_P2,a_P3,a_P0,a_Q0,a_Q1,a_Q2,a_R0,a_R1,a_R2,a_S0,a_S1;
   int b_P1,b_P2,b_P3,b_P0,b_Q0,b_Q1,b_Q2,b_R0,b_R1,b_R2,b_S0,b_S1;
-  
-  
-  int dataPoly[NB_TILES*20];
+
+
 
   line=0;col=0;
   my_printf(" Processoooorr begin to compuuuute !\r\n");
@@ -90,11 +92,12 @@ int main(void) {
     X_2 = X*X;
     Y=16*line;
     Y_2 = Y*Y;
+    col++;
     if (col == WIDTH/TILE_SIZE) {
       line++;
       col=0;
       my_printf("Line ended !! \r\n");
-     }
+    }
     //P1(X,Y) and S1(X0,Y0)
     a_P1 = a_c10 * X + a_c01 * Y + a_c00;
     //P2(X,Y) and R2(X0,Y0)
@@ -164,7 +167,7 @@ int main(void) {
     dataPoly[i*20+7] = a_S0;
     dataPoly[i*20+8] = a_S1;
     dataPoly[i*20+9] = a_P0;
-    
+
     dataPoly[i*20+10] = b_Q0;
     dataPoly[i*20+11] = b_Q1;
     dataPoly[i*20+12] = b_Q2;
@@ -176,15 +179,75 @@ int main(void) {
     dataPoly[i*20+18] = b_S1;
     dataPoly[i*20+19] = b_P0;
 
-
- }
-  
-  *((volatile unsigned int *) INCREMENT_BASE ) = dataPoly;
-  *((volatile unsigned int *) OUTPUT_BASE) = RAM_BASE;
- getchar();
-  return 0;
-
+  }
 }
+
+
+
+
+
+#define INCREMENT *((volatile unsigned int *) INCREMENT_BASE )
+#define OUTPUT   *((volatile unsigned int *) OUTPUT_BASE)
+#define VIDEO_OUT   *((volatile unsigned int *)VIDEO_OUT_BASE)
+#define VIDEO_IN    *((volatile unsigned int *)VIDEO_IN_BASE)
+
+#define IMAGES_NUMBER 8
+
+  volatile unsigned int video_in_index;
+  volatile unsigned int processing_index;
+  volatile int difference;
+  image_t images[IMAGES_NUMBER] = { { { 0 } } };
+  image_coeffs_t image_coeffs;
+
+
+  void video_in_handler() {
+    video_in_index++;
+    //Give video_in an address.
+    VIDEO_IN  = (uint32_t)&images[(video_in_index)%IMAGES_NUMBER] ;
+    if (video_in_index - processing_index == 2) {
+      disable_irq (2);
+    }
+  }
+
+  void video_processing_task() {
+    for(;;) {
+      //Wait unilt video_in_index is greater than processing_index
+      while(video_in_index  == processing_index);
+
+      uint32_t image_address = (uint32_t)&images[processing_index%IMAGES_NUMBER];
+      my_printf("Processing image : %x\n\r",image_address);
+      vProcessImage(*((image_t *)image_address));
+      VIDEO_OUT = image_address;
+      my_printf("Processed image : %x\n\r",image_address);
+      processing_index++;
+      //Enable irq because we finished processing one image.
+      enable_irq(2);
+    }
+  }
+
+  int main(void) {
+    
+
+    computePolys();
+    irq_enable();
+
+    RegisterIrqEntry(2, &video_in_handler);
+
+    //Initialize processing
+    processing_index = 0;
+
+    //Initialize VIDEO_IN
+    video_in_index = 0;
+    VIDEO_IN  = (uint32_t)&images[0] ;
+
+    //Initialize VIDEO_OUT
+    VIDEO_OUT = (uint32_t)&images[IMAGES_NUMBER-1];
+
+    video_processing_task();
+
+    getchar();
+    return 0;
+  }
 
 
 

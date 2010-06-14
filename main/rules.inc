@@ -16,4 +16,3 @@ clean: soft_clean
 test: test_submodules test_self 
 test_submodules:
 	-@for submodule in $(SUBMODULES); do $(MAKE) -C $$submodule test; done
-
