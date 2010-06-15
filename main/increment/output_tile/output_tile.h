@@ -43,7 +43,8 @@ namespace soclib { namespace caba {
       //pixels coming from interpolation
       sc_core::sc_in<unsigned char> p_intensity;
       sc_core::sc_in<bool> p_valid;
-  
+
+      sc_core::sc_out<bool> p_interrupt;
       //master to output the tile
       WbMaster <wb_param> p_wb_master;
       //slave to get the base address of the image

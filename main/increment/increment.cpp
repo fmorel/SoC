@@ -64,7 +64,9 @@ namespace soclib { namespace caba {
       output_tile.p_resetn(p_resetn);
       output_tile.p_intensity(signal_intensity);
       output_tile.p_valid(signal_valid);
+      output_tile.p_interrupt(p_interrupt);
       
+
       output_tile.p_wb_master(p_output_master);
       output_tile.p_wb_slave(p_output_slave);
 

@@ -155,7 +155,11 @@ int _main(int argc, char *argv[])
   sc_signal<bool> signal_video_out_irq("video_out_irq");
   //irq from video_in
   sc_signal<bool> signal_video_in_irq("video_in_irq");
+  //irq from output_tile
+  sc_signal<bool> signal_increment_irq("increment_irq");
+
   // unconnected irqs
+
   sc_signal<bool> unconnected_irq ("unconnected_irq");
 
   ////////////////////////////////////////////////////////////
@@ -216,6 +220,7 @@ int _main(int argc, char *argv[])
   increment.p_output_master(signal_output_master);
   increment.p_output_slave(signal_output_slave);
 
+  increment.p_interrupt(signal_increment_irq);
 
 
 
@@ -314,7 +319,7 @@ int _main(int argc, char *argv[])
   lm32.p_irq[0] (signal_tty_irq);
   lm32.p_irq[1] (signal_video_out_irq);
   lm32.p_irq[2] (signal_video_in_irq);
-  lm32.p_irq[3] (signal_new_tile_display);
+  lm32.p_irq[3] (signal_increment_irq);
   for (int i=4; i<32; i++)
     lm32.p_irq[i] (unconnected_irq);
 
@@ -344,7 +349,7 @@ int _main(int argc, char *argv[])
 
 #ifdef DO_TRACES
   sc_trace_file *TRACEFILE;
-  TRACEFILE = sc_create_vcd_trace_file("vcd_traces");
+  TRACEFILE = sc_create_vcd_trace_file("/tmp/vcd_traces");
   //sc_trace (TRACEFILE, signal_resetn, "resetn" );
   //sc_trace (TRACEFILE, signal_clk,    "clk"    );
   sc_trace (TRACEFILE, signal_new_tile_display ,"new_tile");

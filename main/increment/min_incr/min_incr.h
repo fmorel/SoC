@@ -42,7 +42,8 @@ namespace soclib { namespace caba {
         WB_LOADING_END,
 		    INIT_INCR_MIN,
         WAIT_COMPUTE_MIN,
-        WAIT_X_Y,
+        WAIT_X_Y_1,
+        WAIT_X_Y_2,
 		    INIT_INCR,
         WAIT_COMPUTE,
 		};

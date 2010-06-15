@@ -140,6 +140,7 @@ namespace soclib { namespace caba {
     void OutputTile<wb_param>::masterMoore() {
       switch(state) {
         case IDLE:
+          p_interrupt=0;
           break;
         case BUFFERING:
           break;
@@ -157,6 +158,8 @@ namespace soclib { namespace caba {
         case END:
           p_wb_master.CYC_O=0;
           p_wb_master.STB_O=0;
+          if (nb_tile==NB_TILES)
+            p_interrupt=1;
           break;
       }
     }

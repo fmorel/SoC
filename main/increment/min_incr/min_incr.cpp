@@ -201,8 +201,12 @@ namespace soclib {
             signal_y_min_mux=false;
             break;
 
-          case WAIT_X_Y:
+          case WAIT_X_Y_1:
             tile_ready=true;
+            break;
+
+          case WAIT_X_Y_2:
+            tile_ready=false;
             break;
 
           case INIT_INCR:
@@ -285,12 +289,16 @@ namespace soclib {
                 i++;
                 //TODO : tuning
                 if (i==257 ) {
-                  next_state=WAIT_X_Y;
+                  next_state=WAIT_X_Y_1;
                   i=0;
                 }
                 break;
 
-              case WAIT_X_Y:
+              case WAIT_X_Y_1:
+                next_state=WAIT_X_Y_2;
+                break;
+
+              case WAIT_X_Y_2:
                 if (ask_for_x_y)
                   next_state=INIT_INCR;
                 break;

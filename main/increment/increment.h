@@ -48,6 +48,8 @@ namespace soclib { namespace caba {
 		/*DEBUG*/	    sc_core::sc_out<int>	min_incr_debug_signal;
 		/*DEBUG*/	    sc_core::sc_out<int>	min_incr_debug_state;
 
+    sc_core::sc_out<bool>     p_interrupt;
+
 		//wishbone interface
 		WbMaster <wb_param>		  p_buffer_master;
 		WbSlave <wb_param>		  p_buffer_slave;
