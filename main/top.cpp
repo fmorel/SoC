@@ -349,16 +349,17 @@ int _main(int argc, char *argv[])
   //sc_trace (TRACEFILE, signal_clk,    "clk"    );
   sc_trace (TRACEFILE, signal_new_tile_display ,"new_tile");
   sc_trace (TRACEFILE, signal_ask_for_x_y_display ,"ask_for_x_y");
-  sc_trace (TRACEFILE, signal_intensity_display ,"intensity");
+  //sc_trace (TRACEFILE, signal_intensity_display ,"intensity");
   sc_trace (TRACEFILE, signal_valid_display ,"valid");
-  sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
-  sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
+  //sc_trace (TRACEFILE, signal_min_incr_debug_state,"status");
+  //sc_trace (TRACEFILE, signal_min_incr_debug_signal,"signal");
   sc_trace (TRACEFILE, signal_minincr_master ,"master_minincr");
   sc_trace (TRACEFILE, signal_buffer_master, "master_buffer");
   sc_trace (TRACEFILE, signal_output_master, "master_output");
   sc_trace(TRACEFILE, signal_video_out_master, "master_videout");
-  sc_trace (TRACEFILE, signal_wb_video_in_slave, "master_videoin");
-
+  sc_trace (TRACEFILE, signal_wb_video_in_master, "master_videoin");
+  sc_trace (TRACEFILE, signal_wb_lm32, "master_proc");
+  
 #endif
 
   ////////////////////////////////////////////////////////////

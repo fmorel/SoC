@@ -232,7 +232,6 @@ namespace soclib {
             switch(state) {
               case WAIT_CONFIG:
                 if (base_address) {
-                 std::cout << "base address is  " << base_address << std::endl;
                   next_state=WB_LOADING_START;
                 }
                 break;
