@@ -1,0 +1,19 @@
+Module('caba:output_tile',
+        classname = 'soclib::caba::OutputTile',
+        tmpl_parameters = [
+            parameter.Module('wb_param',  default = 'caba:wb_param'),
+        ],
+        header_files = ['output_tile.h',],
+	implementation_files = ['output_tile.cpp',],
+	ports = [
+	Port('caba:wb_slave', 'p_wb_slave'),
+	Port('caba:wb_master','p_wb_master'),
+	Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+	Port('caba:clock_in', 'p_clk', auto = 'clock'),
+	],
+	uses = [
+	Uses('caba:wishbone'),
+	],
+	debug = True ,
+      )
+
